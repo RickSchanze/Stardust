@@ -12,9 +12,6 @@
 
 int Main()
 {
-    const int MimallocVersion = mi_version();
-
-    // 展开为一次 log("[Engine] [{}:{}] hello from {}", file, line, "Main")
     StringView View = "Main";
     LogDebug(Engine, "hello from {}", View);
     LogDebug(Render, "origin length {}", 0.0f);
