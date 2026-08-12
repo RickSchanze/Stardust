@@ -19,25 +19,30 @@ alwaysApply: true
 | 类 / 结构体 / 枚举 / 类型别名 | 大驼峰 | `RenderDevice` |
 | 函数 / 方法 | 大驼峰 | `CreateBuffer` |
 | 局部变量 / 参数 | 大驼峰 | `BufferSize` |
-| public 成员 | 大驼峰 | `DeviceName` |
-| protected / private 成员 | `m` + 大驼峰 | `mDeviceName` |
-| 全局变量 | `g` + 大驼峰 | `gEngine` |
-| 静态变量（任意访问属性） | `s` + 大驼峰 | `sInstance` |
+| public 成员（含 static） | 大驼峰，无前缀 | `DeviceName` / `static Instance` |
+| protected / private 成员（含 static） | `m` + 大驼峰 | `mDeviceName` / `static mInstance` |
+| 文件作用域全局变量 | `g` + 大驼峰 | `gEngine` |
+| 静态成员 | **无**单独前缀，按访问属性 | private → `mInstance`；public → `Instance` |
+
+说明：clang-tidy 把静态数据成员归为 `ClassMember`（不是 `PrivateMember`）；未配置时会误判为全局变量并强行加 `g`。已在 `.clang-tidy` 用 `ClassMember` + `ClassMemberIgnoredRegexp` 放行 `m` 前缀。
+
 
 例外：
 
 - C/C++ 链接入口 `main` / `WinMain` 保持小写
 - 第三方库 API 与类型保持原样（如 `spdlog::info`、`glm::vec3`、`mi_version`）
+- 引擎核心类型（`String` / `StringView` / `Logger` 等）**不**放在 `Stardust` 命名空间；模块用目录表达（`Core/`、`RHI/`）
 
-## 尽量不用宏（强制）
+## 宏（强制）
 
-- **禁止**为常量、内联逻辑、类型别名、条件编译业务分支新写 `#define` 宏
-- 改用：`constexpr` / `consteval`、`inline`、`using`、概念与约束、`if constexpr`、模块（若启用）、反射、`std::expected` 等 C++26 能力
-- 仅允许：必须与预处理器交互的极少数情况（`#pragma once`、包含第三方头、无法替代的平台探测），且不得扩散到引擎业务代码
+- **默认**：宏只用于条件编译（`#if` / `#ifdef` 等），例如 `STARDUST_LOG_WITH_FILE_INFO`
+- **特例**：日志宏 `LogDebug` / `LogInfo` / `LogWarn` / `LogError` / `LogCritical`（`Core/Logging/LogMacros.h`）——用预处理拼接 `"[Category] " Format` 字面量，避免运行期拼 format
+- 日志 Category 参数为 `Logcat` 枚举项名（如 `Render`），枚举本身保留作分类清单；禁止再扩大其它业务宏
+- 常量 / 内联逻辑 / 类型别名仍用 `constexpr` / `using` 等，不用宏
 
 ## 格式
 
-- 遵循根目录 `.clang-format`（Allman 大括号、4 空格）
+- 遵循根目录 `.clang-format`（Allman 大括号、4 空格；初始化列表逗号在行尾，禁止 `, Foo` 式 Leading comma）
 - 命名由 `.clang-tidy` 的 `readability-identifier-naming` 约束
 
 ## CMake / 第三方

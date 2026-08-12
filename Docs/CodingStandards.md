@@ -44,10 +44,10 @@ git -c http.proxy=http://127.0.0.1:7890 -c https.proxy=http://127.0.0.1:7890 sub
 | 类 / 结构体 / 枚举 | 大驼峰 | `class RenderPass` | `class render_pass` |
 | 函数 / 方法 | 大驼峰 | `void DrawFrame()` | `void draw_frame()` |
 | 局部变量 / 参数 | 大驼峰 | `int BufferCount` | `int bufferCount` |
-| public 成员 | 大驼峰 | `int Width` | `int width` / `int mWidth` |
-| protected / private | `m` + 大驼峰 | `int mWidth` | `int Width` / `int m_Width` |
-| 全局变量 | `g` + 大驼峰 | `Engine* gEngine` | `Engine* engine` |
-| 静态变量（任意） | `s` + 大驼峰 | `static int sCount` | `static int Count` |
+| public 成员（含 static） | 大驼峰，无前缀 | `int Width` / `static Device* Instance` | `int mWidth` |
+| protected / private（含 static） | `m` + 大驼峰 | `int mWidth` / `static Device* mInstance` | `int Width` / `static sInstance` |
+| 文件作用域全局 | `g` + 大驼峰 | `Engine* gEngine` | `Engine* engine` |
+| 静态成员 | 无单独前缀，按访问属性 | 同上 | `sInstance` / `gMInstance` |
 
 ### 示例
 
@@ -61,12 +61,13 @@ public:
     void CreateBuffer(int BufferSize);
 
     int DeviceIndex = 0;
+    static RenderDevice* Instance;
 
 protected:
     void* mNativeHandle = nullptr;
 
 private:
-    static RenderDevice* sInstance;
+    static RenderDevice* mInstance;
     int mBufferCount = 0;
 };
 
@@ -80,24 +81,23 @@ RenderDevice* gPrimaryDevice = nullptr;
 1. `main` / `WinMain` / `wWinMain` 保持语言要求的名字；业务入口可另写 `Main()`。
 2. 第三方符号不重命名、不包一层仅为改名。
 
-## 4. 尽量不用宏
+## 4. 宏
 
-引擎代码**默认禁止**新增 `#define` 业务宏。
+**默认**：宏只用于条件编译（`#if` / `#ifdef` 等开关）。
 
-| 旧宏写法 | C++26 替代 |
-|----------|------------|
-| `#define K 42` | `constexpr int K = 42;` |
-| `#define Max(a,b) ...` | `constexpr` 函数 / `std::max` |
-| `#define TYPE int` | `using Type = int;` |
-| `#ifdef FEATURE` 业务分支 | `if constexpr`、特性检测、配置对象 |
-| 手工枚举字符串 | 静态反射 |
+**特例**：日志宏（`LogDebug` / `LogInfo` / `LogWarn` / `LogError` / `LogCritical`）——预处理拼接 `"[Category] " Format`，展开为单次 spdlog format；`Category` 为 `Logcat` 枚举项名，枚举保留以列出所有分类。
 
-仅允许与预处理器强绑定的最小集合（如 `#pragma once`、包含第三方、无法替代的平台头探测），不得渗入游戏/引擎逻辑。
+| 用途 | 做法 |
+|------|------|
+| 功能开关 | `#define STARDUST_LOG_WITH_FILE_INFO 1` + `#if` |
+| 日志 | `LogDebug(Render, "{}", 12);` |
+| 数值 / 配置常量 | `inline constexpr int gMinimumLogLevel = 0;` |
+| 其它业务 | **禁止**宏，用语言特性 |
 
 ## 5. 格式化与静态检查
 
-- **clang-format**：Allman 大括号、缩进 4 空格、列宽 120、指针/引用贴类型左侧（`Type*`）
-- **clang-tidy**：`readability-identifier-naming` 按第 3 节规则检查
+- **clang-format**：Allman 大括号、缩进 4 空格、列宽 120、指针/引用贴类型左侧（`Type*`）；构造初始化列表与继承列表逗号在行尾（`BreakConstructorInitializers/BreakInheritanceList: AfterColon`），禁止 Leading comma
+- **clang-tidy**：`readability-identifier-naming` 按第 3 节规则检查。静态数据成员由 `ClassMember` 约束（工具限制，无法按 public/private 拆分）；`m` 前缀通过 `ClassMemberIgnoredRegexp` 放行，避免被误判成 `GlobalVariable` 而改成 `gMInstance`。
 - CLion：启用 ClangFormat、Clang-Tidy，与仓库配置文件对齐
 
 ## 6. 第三方库
