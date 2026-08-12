@@ -1,14 +1,5 @@
 #pragma once
 
-/**
- * 由 Logger.h 末尾包含。
- *
- * 日志宏特例：预处理拼接 "[" #Category "] " Format 字面量。
- * 文件名/行号交给 spdlog pattern（%s 短文件名、%# 行号），不在消息里手拼。
- *
- * 用法：LogDebug(Render, "origin length {}", 0.0f);
- */
-
 #define STARDUST_LOG_IMPL(LevelName, Category, Format, ...)                                                        \
     do                                                                                                             \
     {                                                                                                              \
