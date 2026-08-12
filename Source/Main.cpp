@@ -15,9 +15,13 @@ int Main()
     const int MimallocVersion = mi_version();
 
     // 展开为一次 log("[Engine] [{}:{}] hello from {}", file, line, "Main")
-    LogDebug(Engine, "hello from {}", "Main");
+    StringView View = "Main";
+    LogDebug(Engine, "hello from {}", View);
     LogDebug(Render, "origin length {}", 0.0f);
     LogInfo(Test, "value={}", 42);
+    LogError(Test, "value={}", 42);
+    LogWarn(Test, "value={}", 42);
+    LogCritical(Test, "value={}", 42);
 
     const StringView Name = "Stardust";
     const String Title{Name};
