@@ -1,0 +1,29 @@
+# CLion / CMake
+cmake-build-*/
+out/
+build/
+.vs/
+
+# 旧 FetchContent 残留（已废弃，禁止再使用）
+ThirdParty/.fetch/
+
+# IDE
+.idea/
+*.user
+*.user.*
+
+# 编译产物
+*.o
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.dll
+*.lib
+*.a
+*.so
+
+# 杂项
+compile_commands.json
+.cache/
+*.log

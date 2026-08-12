@@ -1,0 +1,47 @@
+---
+description: Stardust UE 风格命名与 C++/CMake 工程约定（所有对话强制遵守）
+alwaysApply: true
+---
+
+# Stardust 工程约定
+
+## 技术栈
+
+- C++26（GCC 16+），优先使用语言/标准库新特性（含静态反射 `^^` / `std::meta`）
+- 构建：CMake + Ninja，CLion 默认 `cmake-build-*`
+- 目录：`Source/` 引擎代码，`ThirdParty/` 第三方（**仅 git submodule**），根与 `Source/` 各有 `CMakeLists.txt`
+
+## 命名（UE 风格，强制）
+
+| 类别 | 规则 | 示例 |
+|------|------|------|
+| 命名空间 | 大驼峰 | `Stardust::Render` |
+| 类 / 结构体 / 枚举 / 类型别名 | 大驼峰 | `RenderDevice` |
+| 函数 / 方法 | 大驼峰 | `CreateBuffer` |
+| 局部变量 / 参数 | 大驼峰 | `BufferSize` |
+| public 成员 | 大驼峰 | `DeviceName` |
+| protected / private 成员 | `m` + 大驼峰 | `mDeviceName` |
+| 全局变量 | `g` + 大驼峰 | `gEngine` |
+| 静态变量（任意访问属性） | `s` + 大驼峰 | `sInstance` |
+
+例外：
+
+- C/C++ 链接入口 `main` / `WinMain` 保持小写
+- 第三方库 API 与类型保持原样（如 `spdlog::info`、`glm::vec3`、`mi_version`）
+
+## 尽量不用宏（强制）
+
+- **禁止**为常量、内联逻辑、类型别名、条件编译业务分支新写 `#define` 宏
+- 改用：`constexpr` / `consteval`、`inline`、`using`、概念与约束、`if constexpr`、模块（若启用）、反射、`std::expected` 等 C++26 能力
+- 仅允许：必须与预处理器交互的极少数情况（`#pragma once`、包含第三方头、无法替代的平台探测），且不得扩散到引擎业务代码
+
+## 格式
+
+- 遵循根目录 `.clang-format`（Allman 大括号、4 空格）
+- 命名由 `.clang-tidy` 的 `readability-identifier-naming` 约束
+
+## CMake / 第三方
+
+- 源文件不放仓库根目录；目标在 `Source/CMakeLists.txt`
+- **禁止 FetchContent**；第三方只许 `git submodule` + `ThirdParty/CMakeLists.txt` 的 `add_subdirectory`，并链到 `StardustThirdParty`
+- 网络拉取失败时使用本地代理 `http://127.0.0.1:7890`
