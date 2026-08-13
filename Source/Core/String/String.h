@@ -5,6 +5,7 @@
 
 #include <spdlog/fmt/fmt.h>
 
+#include <functional>
 #include <string>
 #include <utility>
 
@@ -16,6 +17,7 @@ public:
     static constexpr std::size_t Npos = StringView::Npos;
 
     using ValueType = char;
+    using value_type = char;
     using SizeType = std::size_t;
     using DifferenceType = std::ptrdiff_t;
     using Pointer = char*;
@@ -215,6 +217,14 @@ public:
         return View();
     }
 
+    [[nodiscard]] const String& ToString() const noexcept
+    {
+        return *this;
+    }
+
+    template <typename... Args>
+    [[nodiscard]] static String Format(fmt::format_string<Args...> FormatStr, Args&&... Arguments);
+
     [[nodiscard]] StringView Substr(SizeType Offset, SizeType Count = Npos) const noexcept
     {
         return View().Substr(Offset, Count);
@@ -360,6 +370,11 @@ public:
         mData.push_back(Character);
     }
 
+    void push_back(char Character)
+    {
+        PushBack(Character);
+    }
+
     void PopBack()
     {
         mData.pop_back();
@@ -433,3 +448,23 @@ struct fmt::formatter<String> : fmt::formatter<StringView>
         return formatter<StringView>::format(Value.View(), Context);
     }
 };
+
+template <>
+struct std::hash<StringView>
+{
+    [[nodiscard]] std::size_t operator()(StringView Value) const noexcept
+    {
+        return std::hash<std::string_view>{}(Value.ToStdStringView());
+    }
+};
+
+template <>
+struct std::hash<String>
+{
+    [[nodiscard]] std::size_t operator()(const String& Value) const noexcept
+    {
+        return std::hash<StringView>{}(Value.View());
+    }
+};
+
+#include "Core/String/Stringable.h"

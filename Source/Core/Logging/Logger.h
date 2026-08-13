@@ -16,6 +16,7 @@ enum class LogLevel
     Warn = 2,
     Error = 3,
     Critical = 4,
+    Assert = 5,
 };
 
 /**

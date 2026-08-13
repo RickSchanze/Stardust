@@ -36,7 +36,7 @@ alwaysApply: true
 ## 宏（强制）
 
 - **默认**：宏只用于条件编译（`#if` / `#ifdef` 等），例如 `STARDUST_LOG_WITH_FILE_INFO`
-- **特例**：日志宏 `LogDebug` / `LogInfo` / `LogWarn` / `LogError` / `LogCritical`（`Core/Logging/LogMacros.h`）——用预处理拼接 `"[Category] " Format` 字面量，避免运行期拼 format
+- **特例**：日志宏 `LogDebug` / `LogInfo` / `LogWarn` / `LogError` / `LogCritical` / `LogAssert`（`Core/Logging/LogMacros.h`）——用预处理拼接 `"[Category] " Format` 字面量，避免运行期拼 format
 - 日志 Category 参数为 `Logcat` 枚举项名（如 `Render`），枚举本身保留作分类清单；禁止再扩大其它业务宏
 - 常量 / 内联逻辑 / 类型别名仍用 `constexpr` / `using` 等，不用宏
 

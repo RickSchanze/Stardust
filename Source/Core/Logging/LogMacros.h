@@ -18,3 +18,4 @@
 #define LogWarn(Category, Format, ...) STARDUST_LOG_IMPL(Warn, Category, Format __VA_OPT__(, ) __VA_ARGS__)
 #define LogError(Category, Format, ...) STARDUST_LOG_IMPL(Error, Category, Format __VA_OPT__(, ) __VA_ARGS__)
 #define LogCritical(Category, Format, ...) STARDUST_LOG_IMPL(Critical, Category, Format __VA_OPT__(, ) __VA_ARGS__)
+#define LogAssert(Category, Format, ...) STARDUST_LOG_IMPL(Assert, Category, Format __VA_OPT__(, ) __VA_ARGS__)
