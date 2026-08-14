@@ -18,7 +18,7 @@ inline void DebugBreak()
 #endif
 }
 
-inline void DebugAssert(bool Condition, std::source_location Location = std::source_location::current())
+inline void DebugAssert(const bool Condition, const std::source_location Location = std::source_location::current())
 {
 #if defined(NDEBUG)
     (void)Condition;
@@ -32,7 +32,7 @@ inline void DebugAssert(bool Condition, std::source_location Location = std::sou
 #endif
 }
 
-inline void Assert(bool Condition, std::source_location Location = std::source_location::current())
+inline void Assert(const bool Condition, const std::source_location Location = std::source_location::current())
 {
     if (!Condition)
     {

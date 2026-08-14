@@ -1,5 +1,3 @@
-#include <glm/geometric.hpp>
-#include <glm/vec3.hpp>
 #include <mimalloc-new-delete.h>
 #include <mimalloc.h>
 #include <spdlog/spdlog.h>
@@ -12,11 +10,15 @@
 #include "Core/Container/Span.h"
 #include "Core/Debug/Debug.h"
 #include "Core/Logging/Logger.h"
+#include "Core/Math/Color.h"
+#include "Core/Math/Matrix.h"
+#include "Core/Math/Rect.h"
+#include "Core/Math/Vector.h"
 #include "Core/Memory/Memory.h"
 #include "Core/String/String.h"
 #include "Core/String/StringView.h"
 
-enum class Color
+enum class NamedColor
 {
     Red,
     Green,
@@ -77,11 +79,53 @@ static void SmokeTestContainersAndFormat()
     const String Formatted = String::Format("n={:04d} ok={} color={} member={} free={} name={}",
                                             42,
                                             true,
-                                            Color::Green,
+                                            NamedColor::Green,
                                             MemberNamed{},
                                             FreeNamed{},
                                             StringView{"Stardust"});
     LogInfo(Test, "{}", Formatted);
+}
+
+static void SmokeTestMath()
+{
+    const Vector3f Origin{0.0f, 1.0f, 0.0f};
+    const Vector3f Forward = Vector3f::UnitZ();
+    const Vector3f Side = Origin.Cross(Forward).Normalized();
+    Assert(Side.IsNormalized());
+    Assert(Origin.Dot(Forward) == 0.0f);
+
+    const Vector2f Screen{1920.0f, 1080.0f};
+    Assert(Screen.LengthSquared() > 0.0f);
+
+    const Matrix4x4f Transform = Matrix4x4f::Translation(Origin) * Matrix4x4f::Scaling(Vector3f{2.0f});
+    const Vector3f Transformed = Transform.TransformPoint(Vector3f::UnitX());
+    Assert(Transformed.Equals(Vector3f{2.0f, 1.0f, 0.0f}, 0.0001f));
+
+    const Rectf Box = Rectf::FromCenterSize(Vector2f{0.0f, 0.0f}, Vector2f{2.0f, 2.0f});
+    Assert(Box.Contains(Vector2f{0.5f, 0.5f}));
+    Assert(Box.Overlaps(Rectf{-1.0f, -1.0f, 0.0f, 0.0f}));
+
+    const Rect3Df Volume{Vector3f{-1.0f}, Vector3f{1.0f}};
+    Assert(Volume.Contains(Vector3f{}));
+    Assert(Volume.Volume() == 8.0f);
+
+    LogInfo(Test, "origin={} matrix={} rect={}", Origin, Transform, Box);
+}
+
+static void SmokeTestColor()
+{
+    const Colorf Red{1.0f, 0.0f, 0.0f};
+    const Color8 Red8{255, 0, 0};
+    const Colorf FromBytes = Red8;
+    const Color8 FromNormalized = Red;
+    Assert(FromBytes == Red);
+    Assert(FromNormalized == Red8);
+    Assert(Colorf{Vector3f{0.0f, 1.0f, 0.0f}} == Colorf::Green());
+    Assert(Color8{Vector3<std::uint8_t>{0, 0, 255}} == Color8::Blue());
+    Assert(Colorf(255, 0, 0) == Red);
+    Assert(Color8(1.0f, 0.0f, 0.0f) == Red8);
+
+    LogInfo(Test, "color={} color8={}", Red, Red8);
 }
 
 static int Main()
@@ -100,11 +144,11 @@ static int Main()
     int* Value = New<int>(42);
     Delete(Value);
 
-    const glm::vec3 Origin{0.0f, 0.0f, 0.0f};
-    (void)Origin;
     (void)Title;
 
     SmokeTestContainersAndFormat();
+    SmokeTestMath();
+    SmokeTestColor();
 
     return 0;
 }
