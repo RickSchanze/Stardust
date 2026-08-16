@@ -15,6 +15,7 @@
 #include "Core/Math/Rect.h"
 #include "Core/Math/Vector.h"
 #include "Core/Memory/Memory.h"
+#include "Core/Number.h"
 #include "Core/Profiler/Profiler.h"
 #include "Core/String/String.h"
 #include "Core/String/StringView.h"
@@ -136,6 +137,37 @@ static void SmokeTestProfiler()
     PerformanceCounter _{"Colored", 0x4488FF};
 }
 
+static void SmokeTestNumber()
+{
+    Int32 Count = 40;
+    Count += 2;
+    ++Count;
+    Assert(Count == 43);
+    Assert(Int32::Abs(Int32{-7}) == 7);
+    Assert(Int32::Clamp(Int32{9}, Int32{0}, Int32{5}) == 5);
+    Assert(Int32::IsEven(Int32{4}));
+    Assert(Int32::IsPow2(Int32{8}));
+    Assert(Int8::CreateSaturating(1024) == Int8::MaxValue);
+
+    Int32 Parsed{};
+    Assert(Int32::TryParse(StringView{"  -12 "}, Parsed));
+    Assert(Parsed == -12);
+    Assert(!Int32::TryParse(StringView{"12x"}, Parsed));
+    Assert(Int32::Parse(StringView{"255"}) == 255);
+
+    Float Ratio = 2.5f;
+    Assert(Float::IsFinite(Ratio));
+    Assert(Float::Sqrt(Float{4.0f}) == 2.0f);
+    Float Infinity{};
+    Assert(Float::TryParse(StringView{"Infinity"}, Infinity));
+    Assert(Float::IsPositiveInfinity(Infinity));
+
+    UInt8 Byte{7};
+    Assert(String::Format("{:02x}", Byte) == StringView{"07"});
+    Assert(String::Format("{}", Int32{42}) == StringView{"42"});
+    LogInfo(Test, "int32={} float={}", Int32{42}, Float{1.5f});
+}
+
 static int Main()
 {
     PerformanceCounter _{"Main"};
@@ -160,6 +192,7 @@ static int Main()
     SmokeTestMath();
     SmokeTestColor();
     SmokeTestProfiler();
+    SmokeTestNumber();
 
     MarkFrame();
     return 0;

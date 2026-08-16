@@ -1,6 +1,7 @@
-set(STARDUST_SOURCES
-    Main.cpp
-    Core/Logging/Logger.cpp
+file(GLOB_RECURSE STARDUST_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cc"
 )
 
 add_executable(Stardust ${STARDUST_SOURCES})
