@@ -34,9 +34,11 @@ CheckOptions:
   - key: readability-identifier-naming.IgnoredFunctions
     value: 'main;WinMain;wWinMain'
 
-  # 局部变量、参数：大驼峰
+  # 局部变量、参数：大驼峰；C++26 占位符 `_` 可在同作用域重复声明
   - key: readability-identifier-naming.LocalVariableCase
     value: CamelCase
+  - key: readability-identifier-naming.LocalVariableIgnoredRegexp
+    value: '^_$'
   - key: readability-identifier-naming.ParameterCase
     value: CamelCase
 

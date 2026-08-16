@@ -15,6 +15,7 @@
 #include "Core/Math/Rect.h"
 #include "Core/Math/Vector.h"
 #include "Core/Memory/Memory.h"
+#include "Core/Profiler/Profiler.h"
 #include "Core/String/String.h"
 #include "Core/String/StringView.h"
 
@@ -128,8 +129,17 @@ static void SmokeTestColor()
     LogInfo(Test, "color={} color8={}", Red, Red8);
 }
 
+static void SmokeTestProfiler()
+{
+    PerformanceCounter _{};
+    PerformanceCounter _{"Named"};
+    PerformanceCounter _{"Colored", 0x4488FF};
+}
+
 static int Main()
 {
+    PerformanceCounter _{"Main"};
+
     StringView View = "Main";
     LogDebug(Engine, "hello from {}", View);
     LogDebug(Render, "origin length {}", 0.0f);
@@ -149,7 +159,9 @@ static int Main()
     SmokeTestContainersAndFormat();
     SmokeTestMath();
     SmokeTestColor();
+    SmokeTestProfiler();
 
+    MarkFrame();
     return 0;
 }
 

@@ -7,3 +7,15 @@
 [submodule "ThirdParty/glm"]
 	path = ThirdParty/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "ThirdParty/tracy"]
+	path = ThirdParty/tracy
+	url = https://github.com/RickSchanze/tracy.git
+[submodule "ThirdParty/volk"]
+	path = ThirdParty/volk
+	url = https://github.com/RickSchanze/volk.git
+[submodule "ThirdParty/VulkanMemoryAllocator"]
+	path = ThirdParty/VulkanMemoryAllocator
+	url = https://github.com/RickSchanze/VulkanMemoryAllocator.git
+[submodule "ThirdParty/Vulkan-Headers"]
+	path = ThirdParty/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git

@@ -5,7 +5,7 @@
 
 #include "Core/Logging/Logger.h"
 
-inline void DebugBreak()
+inline void DebugBreakpoint()
 {
 #if defined(_MSC_VER)
     __debugbreak();
@@ -24,20 +24,20 @@ inline void DebugAssert(const bool Condition, const std::source_location Locatio
     (void)Condition;
     (void)Location;
 #else
-    if (!Condition)
+    if (!Condition) [[unlikely]]
     {
         Logger::Log(LogLevel::Assert, Logcat::Assert, Location, "[Assert] DebugAssert failed");
-        DebugBreak();
+        DebugBreakpoint();
     }
 #endif
 }
 
 inline void Assert(const bool Condition, const std::source_location Location = std::source_location::current())
 {
-    if (!Condition)
+    if (!Condition) [[unlikely]]
     {
         Logger::Log(LogLevel::Assert, Logcat::Assert, Location, "[Assert] Assertion failed");
-        DebugBreak();
+        DebugBreakpoint();
         std::abort();
     }
 }

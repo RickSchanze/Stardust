@@ -7,6 +7,10 @@
 | spdlog | `ThirdParty/spdlog` | https://github.com/RickSchanze/spdlog.git |
 | mimalloc | `ThirdParty/mimalloc` | https://github.com/RickSchanze/mimalloc |
 | glm | `ThirdParty/glm` | https://github.com/g-truc/glm.git |
+| tracy | `ThirdParty/tracy` | https://github.com/RickSchanze/tracy.git |
+| volk | `ThirdParty/volk` | https://github.com/RickSchanze/volk.git |
+| VulkanMemoryAllocator | `ThirdParty/VulkanMemoryAllocator` | https://github.com/RickSchanze/VulkanMemoryAllocator.git |
+| Vulkan-Headers | `ThirdParty/Vulkan-Headers` | https://github.com/KhronosGroup/Vulkan-Headers.git |
 
 ```bash
 git submodule update --init --recursive
