@@ -7,7 +7,7 @@
 - **标准**：C++26（`CMAKE_CXX_STANDARD 26`）
 - **编译器**：GCC 16+（MSYS2 / CLion Toolchain）
 - **特性优先**：能用语言/标准库解决的，不用宏或过时惯用法；静态反射（`^^`、`std::meta`、splicer `[: :]`）按 GCC 实现使用
-- **IDE**：CLion；构建目录为 CMake 生成目录（如 `cmake-build-debug`）
+- **IDE**：CLion；构建目录为 `Build/Debug`、`Build/Release`、`Build/RelWithDebugInfo`
 
 ## 2. 仓库布局
 

@@ -1,4 +1,5 @@
 # CLion / CMake
+Build/
 cmake-build-*/
 out/
 build/
@@ -11,6 +12,7 @@ ThirdParty/.fetch/
 .idea/
 *.user
 *.user.*
+CMakeUserPresets.json
 
 # 编译产物
 *.o

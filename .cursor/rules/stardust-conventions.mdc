@@ -8,7 +8,7 @@ alwaysApply: true
 ## 技术栈
 
 - C++26（GCC 16+），优先使用语言/标准库新特性（含静态反射 `^^` / `std::meta`）
-- 构建：CMake + Ninja，CLion 默认 `cmake-build-*`
+- 构建：CMake + Ninja，生成目录 `Build/Debug`、`Build/Release`、`Build/RelWithDebugInfo`
 - 目录：`Source/` 引擎代码，`ThirdParty/` 第三方（**仅 git submodule**），根与 `Source/` 各有 `CMakeLists.txt`
 
 ## 命名（UE 风格，强制）

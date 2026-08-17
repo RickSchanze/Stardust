@@ -1,0 +1,80 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/msys64/ucrt64/bin/g++.exe",
+        "CMAKE_MAKE_PROGRAM": "C:/msys64/ucrt64/bin/ninja.exe",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      },
+      "environment": {
+        "PATH": "C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\bin;$penv{PATH}"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug (GCC 16 / MSYS2 UCRT64)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/Build/Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "MSYS2 UCRT64"
+        }
+      }
+    },
+    {
+      "name": "relwithdebinfo",
+      "displayName": "RelWithDebInfo (GCC 16 / MSYS2 UCRT64)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/Build/RelWithDebugInfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "MSYS2 UCRT64"
+        }
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release (GCC 16 / MSYS2 UCRT64)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/Build/Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "MSYS2 UCRT64"
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "relwithdebinfo",
+      "configurePreset": "relwithdebinfo"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    }
+  ]
+}
