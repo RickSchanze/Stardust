@@ -1,16 +1,28 @@
 #pragma once
+
+#include "Core/Container/Array.h"
 #include "Core/Number.h"
+#include "Core/Ptr.h"
+
+#include "RHI/GPUHandlePool.h"
 
 namespace RHI
 {
-    struct GPUHandle
-    {
-        UInt32 Index;
-        UInt32 Generation;
-    };
 
-    struct TextureHandle
-    {
-        GPUHandle Handle;
-    };
+struct TextureDesc
+{
+};
+
+struct GPUTexture
+{
+    TextureDesc Desc;
+    IntPtr Native;
+};
+
+class Device
+{
+    GPUHandlePool mTextureHandles;
+    Array<GPUTexture> mTextures;
+};
+
 } // namespace RHI

@@ -65,6 +65,12 @@ CheckOptions:
   - key: readability-identifier-naming.ClassMemberIgnoredRegexp
     value: 'm[A-Z].*'
 
+  # public static constexpr（如 GPUHandlePool::InvalidIndex）
+  - key: readability-identifier-naming.ClassConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassConstantPrefix
+    value: ''
+
   # 文件作用域全局：g + 大驼峰
   - key: readability-identifier-naming.GlobalVariableCase
     value: CamelCase
