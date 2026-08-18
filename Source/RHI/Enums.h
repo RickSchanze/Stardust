@@ -292,7 +292,6 @@ enum class [[=EnumFlag()]] TextureCreateFlag : std::uint32_t
     SparseBinding = 1u << 0,
     SparseResidency = 1u << 1,
     SparseAliased = 1u << 2,
-    MutableFormat = 1u << 3,
     CubeCompatible = 1u << 4,
     Array2DCompatible = 1u << 5,
     BlockTexelViewCompatible = 1u << 7,
