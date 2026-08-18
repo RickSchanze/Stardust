@@ -246,20 +246,20 @@ namespace RHI
     {
         for (std::size_t RangeIndex = 0; RangeIndex < Desc.PushConstantRanges.Num(); ++RangeIndex)
         {
-            const PushConstantRangeDesc& Range = Desc.PushConstantRanges[RangeIndex];
-            if (Range.Stages == ShaderStageFlag::None)
+            const auto& [Stages, Offset, Size] = Desc.PushConstantRanges[RangeIndex];
+            if (Stages == ShaderStageFlag::None)
             {
                 SetValidationError(ErrorMessage, "Push constant ranges must declare at least one shader stage.");
                 return false;
             }
 
-            if (Range.Size == 0)
+            if (Size == 0)
             {
                 SetValidationError(ErrorMessage, "Push constant ranges must use a size greater than zero.");
                 return false;
             }
 
-            if ((Range.Offset % 4) != 0 || (Range.Size % 4) != 0)
+            if ((Offset % 4) != 0 || (Size % 4) != 0)
             {
                 SetValidationError(ErrorMessage, "Push constant ranges must use 4-byte aligned offset and size.");
                 return false;
@@ -283,8 +283,8 @@ namespace RHI
             return false;
         }
 
-        const UInt32 AttachmentCount = static_cast<UInt32>(Desc.Attachments.Num());
-        const UInt32 SubpassCount = static_cast<UInt32>(Desc.Subpasses.Num());
+        const auto AttachmentCount = static_cast<UInt32>(Desc.Attachments.Num());
+        const auto SubpassCount = static_cast<UInt32>(Desc.Subpasses.Num());
 
         for (const RenderPassAttachmentDesc& Attachment : Desc.Attachments)
         {
