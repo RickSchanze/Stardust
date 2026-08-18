@@ -28,10 +28,7 @@ public:
 
     Map() = default;
 
-    Map(std::initializer_list<ElementType> List)
-        : mData(List)
-    {
-    }
+    Map(std::initializer_list<ElementType> List) : mData(List) {}
 
     [[nodiscard]] SizeType Num() const noexcept
     {

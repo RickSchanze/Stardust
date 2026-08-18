@@ -15,8 +15,7 @@
 #include "Core/String/StringView.h"
 
 template <typename T>
-concept NumberValue =
-    (std::integral<T> && !std::same_as<T, bool> && !std::same_as<T, char>) || std::floating_point<T>;
+concept NumberValue = (std::integral<T> && !std::same_as<T, bool> && !std::same_as<T, char>) || std::floating_point<T>;
 
 template <NumberValue T>
 class Number
@@ -33,15 +32,11 @@ public:
 
     constexpr Number() noexcept = default;
 
-    constexpr Number(const T InValue) noexcept
-        : Value(InValue)
-    {
-    }
+    constexpr Number(const T InValue) noexcept : Value(InValue) {}
 
     template <NumberValue U>
         requires(!std::same_as<U, T>)
-    constexpr Number(const Number<U> Other) noexcept
-        : Value(static_cast<T>(Other.Value))
+    constexpr Number(const Number<U> Other) noexcept : Value(static_cast<T>(Other.Value))
     {
     }
 
@@ -244,7 +239,8 @@ public:
         return Left.Value < Right.Value ? Right : Left;
     }
 
-    [[nodiscard]] static constexpr Number Clamp(const Number Value, const Number MinValue, const Number MaxValue) noexcept
+    [[nodiscard]] static constexpr Number
+    Clamp(const Number Value, const Number MinValue, const Number MaxValue) noexcept
     {
         return Max(MinValue, Min(MaxValue, Value));
     }
@@ -715,23 +711,23 @@ using Double = Number<double>;
 
 namespace NumberDetail
 {
-template <typename T>
-struct FormatUnderlying
-{
-    using Type = T;
-};
+    template <typename T>
+    struct FormatUnderlying
+    {
+        using Type = T;
+    };
 
-template <>
-struct FormatUnderlying<std::int8_t>
-{
-    using Type = int;
-};
+    template <>
+    struct FormatUnderlying<std::int8_t>
+    {
+        using Type = int;
+    };
 
-template <>
-struct FormatUnderlying<std::uint8_t>
-{
-    using Type = unsigned;
-};
+    template <>
+    struct FormatUnderlying<std::uint8_t>
+    {
+        using Type = unsigned;
+    };
 } // namespace NumberDetail
 
 template <NumberValue T>

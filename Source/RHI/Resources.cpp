@@ -2,22 +2,22 @@
 
 namespace RHI
 {
-
-namespace
-{
-    void SetValidationError(String* ErrorMessage, const char* Message)
+    namespace
     {
-        if (ErrorMessage != nullptr)
+        void SetValidationError(String* ErrorMessage, const char* Message)
         {
-            *ErrorMessage = String{Message};
+            if (ErrorMessage != nullptr)
+            {
+                *ErrorMessage = String{Message};
+            }
         }
-    }
 
-    [[nodiscard]] bool IsAttachmentReferenceValid(const RenderPassAttachmentRef& Reference, const UInt32 AttachmentCount)
-    {
-        return Reference.Attachment == UnusedAttachmentIndex || Reference.Attachment < AttachmentCount;
-    }
-} // namespace
+        [[nodiscard]] bool IsAttachmentReferenceValid(const RenderPassAttachmentRef& Reference,
+                                                      const UInt32 AttachmentCount)
+        {
+            return Reference.Attachment == UnusedAttachmentIndex || Reference.Attachment < AttachmentCount;
+        }
+    } // namespace
 
     bool ValidateBufferDesc(const BufferDesc& Desc, String* ErrorMessage)
     {
@@ -111,7 +111,8 @@ namespace
 
             if ((Desc.ArrayLayers % 6) != 0)
             {
-                SetValidationError(ErrorMessage, "Cube-compatible textures must use an array layer count divisible by 6.");
+                SetValidationError(ErrorMessage,
+                                   "Cube-compatible textures must use an array layer count divisible by 6.");
                 return false;
             }
         }
@@ -158,7 +159,8 @@ namespace
 
         if (Desc.AnisotropyEnable && Desc.MaxAnisotropy < 1.0f)
         {
-            SetValidationError(ErrorMessage, "SamplerDesc.MaxAnisotropy must be at least 1 when anisotropy is enabled.");
+            SetValidationError(ErrorMessage,
+                               "SamplerDesc.MaxAnisotropy must be at least 1 when anisotropy is enabled.");
             return false;
         }
 
@@ -195,13 +197,15 @@ namespace
             const DescriptorBindingDesc& Binding = Desc.Bindings[BindingIndex];
             if (Binding.DescriptorCount == 0)
             {
-                SetValidationError(ErrorMessage, "DescriptorSetLayoutDesc bindings must use a descriptor count greater than zero.");
+                SetValidationError(ErrorMessage,
+                                   "DescriptorSetLayoutDesc bindings must use a descriptor count greater than zero.");
                 return false;
             }
 
             if (Binding.Stages == ShaderStageFlag::None)
             {
-                SetValidationError(ErrorMessage, "DescriptorSetLayoutDesc bindings must declare at least one shader stage.");
+                SetValidationError(ErrorMessage,
+                                   "DescriptorSetLayoutDesc bindings must declare at least one shader stage.");
                 return false;
             }
 
@@ -209,7 +213,8 @@ namespace
             {
                 if (Binding.Type != DescriptorType::Sampler && Binding.Type != DescriptorType::CombinedTextureSampler)
                 {
-                    SetValidationError(ErrorMessage,
+                    SetValidationError(
+                        ErrorMessage,
                         "Immutable samplers are only valid for Sampler or CombinedTextureSampler bindings.");
                     return false;
                 }
@@ -217,16 +222,18 @@ namespace
                 if (Binding.ImmutableSamplers.Num() != Binding.DescriptorCount)
                 {
                     SetValidationError(ErrorMessage,
-                        "Immutable sampler count must match DescriptorBindingDesc.DescriptorCount.");
+                                       "Immutable sampler count must match DescriptorBindingDesc.DescriptorCount.");
                     return false;
                 }
             }
 
-            for (std::size_t OtherBindingIndex = BindingIndex + 1; OtherBindingIndex < Desc.Bindings.Num(); ++OtherBindingIndex)
+            for (std::size_t OtherBindingIndex = BindingIndex + 1; OtherBindingIndex < Desc.Bindings.Num();
+                 ++OtherBindingIndex)
             {
                 if (Binding.Binding == Desc.Bindings[OtherBindingIndex].Binding)
                 {
-                    SetValidationError(ErrorMessage, "DescriptorSetLayoutDesc bindings must use unique binding numbers.");
+                    SetValidationError(ErrorMessage,
+                                       "DescriptorSetLayoutDesc bindings must use unique binding numbers.");
                     return false;
                 }
             }
@@ -299,11 +306,13 @@ namespace
 
             if (Subpass.ColorAttachments.Empty() && Subpass.DepthStencilAttachment.Attachment == UnusedAttachmentIndex)
             {
-                SetValidationError(ErrorMessage, "Each subpass must bind at least one color or depth-stencil attachment.");
+                SetValidationError(ErrorMessage,
+                                   "Each subpass must bind at least one color or depth-stencil attachment.");
                 return false;
             }
 
-            if (!Subpass.ResolveAttachments.Empty() && Subpass.ResolveAttachments.Num() != Subpass.ColorAttachments.Num())
+            if (!Subpass.ResolveAttachments.Empty() &&
+                Subpass.ResolveAttachments.Num() != Subpass.ColorAttachments.Num())
             {
                 SetValidationError(ErrorMessage, "Resolve attachment count must match color attachment count.");
                 return false;
@@ -338,7 +347,8 @@ namespace
 
             if (!IsAttachmentReferenceValid(Subpass.DepthStencilAttachment, AttachmentCount))
             {
-                SetValidationError(ErrorMessage, "RenderPassSubpassDesc depth-stencil attachment index is out of range.");
+                SetValidationError(ErrorMessage,
+                                   "RenderPassSubpassDesc depth-stencil attachment index is out of range.");
                 return false;
             }
 
@@ -346,7 +356,8 @@ namespace
             {
                 if (PreserveAttachment >= AttachmentCount)
                 {
-                    SetValidationError(ErrorMessage, "RenderPassSubpassDesc preserve attachment index is out of range.");
+                    SetValidationError(ErrorMessage,
+                                       "RenderPassSubpassDesc preserve attachment index is out of range.");
                     return false;
                 }
             }
@@ -386,7 +397,8 @@ namespace
 
         if (Desc.FragmentShader.IsNull())
         {
-            SetValidationError(ErrorMessage, "GraphicsPipelineDesc.FragmentShader must reference a valid shader handle.");
+            SetValidationError(ErrorMessage,
+                               "GraphicsPipelineDesc.FragmentShader must reference a valid shader handle.");
             return false;
         }
 
@@ -398,7 +410,9 @@ namespace
 
         if (Desc.ColorAttachments.Empty() && Desc.DepthStencilFormat == PixelFormat::Undefined)
         {
-            SetValidationError(ErrorMessage, "GraphicsPipelineDesc must define at least one color attachment or a depth-stencil format.");
+            SetValidationError(
+                ErrorMessage,
+                "GraphicsPipelineDesc must define at least one color attachment or a depth-stencil format.");
             return false;
         }
 
@@ -421,7 +435,6 @@ namespace
 
         return true;
     }
-
 } // namespace RHI
 
 template class RHI::GPUResourcePool<RHI::GPUBuffer>;

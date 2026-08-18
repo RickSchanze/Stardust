@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/Memory/Memory.h"
-
 #include <cstddef>
 #include <new>
+
+#include "Core/Memory/Memory.h"
 
 template <typename T>
 class MiAllocator

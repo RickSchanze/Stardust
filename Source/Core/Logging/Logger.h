@@ -31,20 +31,16 @@ public:
     [[nodiscard]] static spdlog::logger& Get();
 
     template <typename... Args>
-    static void Log(
-        LogLevel InLevel,
-        Logcat InLogcat,
-        const std::source_location& InLocation,
-        spdlog::format_string_t<Args...> InFormat,
-        Args&&... InArgs)
+    static void Log(LogLevel InLevel,
+                    Logcat InLogcat,
+                    const std::source_location& InLocation,
+                    spdlog::format_string_t<Args...> InFormat,
+                    Args&&... InArgs)
     {
         EnsureInitialized();
         (void)InLogcat; // 保留分类，供后续按 Logcat 过滤 / 分流
         mLogger->log(
-            spdlog::source_loc{
-                InLocation.file_name(),
-                static_cast<int>(InLocation.line()),
-                InLocation.function_name()},
+            spdlog::source_loc{InLocation.file_name(), static_cast<int>(InLocation.line()), InLocation.function_name()},
             ToSpdlogLevel(InLevel),
             InFormat,
             std::forward<Args>(InArgs)...);

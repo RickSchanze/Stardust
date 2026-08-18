@@ -441,23 +441,11 @@ public:
 
     constexpr Vector2() noexcept = default;
 
-    constexpr Vector2(T InX, T InY) noexcept
-        : X(InX),
-          Y(InY)
-    {
-    }
+    constexpr Vector2(T InX, T InY) noexcept : X(InX), Y(InY) {}
 
-    constexpr explicit Vector2(T Scalar) noexcept
-        : X(Scalar),
-          Y(Scalar)
-    {
-    }
+    constexpr explicit Vector2(T Scalar) noexcept : X(Scalar), Y(Scalar) {}
 
-    constexpr Vector2(const GlmType& Value) noexcept
-        : X(Value.x),
-          Y(Value.y)
-    {
-    }
+    constexpr Vector2(const GlmType& Value) noexcept : X(Value.x), Y(Value.y) {}
 
     [[nodiscard]] static constexpr Vector2 UnitX() noexcept
     {
@@ -502,40 +490,15 @@ public:
 
     constexpr Vector3() noexcept = default;
 
-    constexpr Vector3(T InX, T InY, T InZ) noexcept
-        : X(InX),
-          Y(InY),
-          Z(InZ)
-    {
-    }
+    constexpr Vector3(T InX, T InY, T InZ) noexcept : X(InX), Y(InY), Z(InZ) {}
 
-    constexpr explicit Vector3(T Scalar) noexcept
-        : X(Scalar),
-          Y(Scalar),
-          Z(Scalar)
-    {
-    }
+    constexpr explicit Vector3(T Scalar) noexcept : X(Scalar), Y(Scalar), Z(Scalar) {}
 
-    constexpr Vector3(const Vector2<T>& XY, T InZ) noexcept
-        : X(XY.X),
-          Y(XY.Y),
-          Z(InZ)
-    {
-    }
+    constexpr Vector3(const Vector2<T>& XY, T InZ) noexcept : X(XY.X), Y(XY.Y), Z(InZ) {}
 
-    constexpr Vector3(T InX, const Vector2<T>& YZ) noexcept
-        : X(InX),
-          Y(YZ.X),
-          Z(YZ.Y)
-    {
-    }
+    constexpr Vector3(T InX, const Vector2<T>& YZ) noexcept : X(InX), Y(YZ.X), Z(YZ.Y) {}
 
-    constexpr Vector3(const GlmType& Value) noexcept
-        : X(Value.x),
-          Y(Value.y),
-          Z(Value.z)
-    {
-    }
+    constexpr Vector3(const GlmType& Value) noexcept : X(Value.x), Y(Value.y), Z(Value.z) {}
 
     [[nodiscard]] static constexpr Vector3 UnitX() noexcept
     {
@@ -594,53 +557,17 @@ public:
 
     constexpr Vector4() noexcept = default;
 
-    constexpr Vector4(T InX, T InY, T InZ, T InW) noexcept
-        : X(InX),
-          Y(InY),
-          Z(InZ),
-          W(InW)
-    {
-    }
+    constexpr Vector4(T InX, T InY, T InZ, T InW) noexcept : X(InX), Y(InY), Z(InZ), W(InW) {}
 
-    constexpr explicit Vector4(T Scalar) noexcept
-        : X(Scalar),
-          Y(Scalar),
-          Z(Scalar),
-          W(Scalar)
-    {
-    }
+    constexpr explicit Vector4(T Scalar) noexcept : X(Scalar), Y(Scalar), Z(Scalar), W(Scalar) {}
 
-    constexpr Vector4(const Vector3<T>& XYZ, T InW) noexcept
-        : X(XYZ.X),
-          Y(XYZ.Y),
-          Z(XYZ.Z),
-          W(InW)
-    {
-    }
+    constexpr Vector4(const Vector3<T>& XYZ, T InW) noexcept : X(XYZ.X), Y(XYZ.Y), Z(XYZ.Z), W(InW) {}
 
-    constexpr Vector4(const Vector2<T>& XY, T InZ, T InW) noexcept
-        : X(XY.X),
-          Y(XY.Y),
-          Z(InZ),
-          W(InW)
-    {
-    }
+    constexpr Vector4(const Vector2<T>& XY, T InZ, T InW) noexcept : X(XY.X), Y(XY.Y), Z(InZ), W(InW) {}
 
-    constexpr Vector4(const Vector2<T>& XY, const Vector2<T>& ZW) noexcept
-        : X(XY.X),
-          Y(XY.Y),
-          Z(ZW.X),
-          W(ZW.Y)
-    {
-    }
+    constexpr Vector4(const Vector2<T>& XY, const Vector2<T>& ZW) noexcept : X(XY.X), Y(XY.Y), Z(ZW.X), W(ZW.Y) {}
 
-    constexpr Vector4(const GlmType& Value) noexcept
-        : X(Value.x),
-          Y(Value.y),
-          Z(Value.z),
-          W(Value.w)
-    {
-    }
+    constexpr Vector4(const GlmType& Value) noexcept : X(Value.x), Y(Value.y), Z(Value.z), W(Value.w) {}
 
     [[nodiscard]] static constexpr Vector4 UnitX() noexcept
     {

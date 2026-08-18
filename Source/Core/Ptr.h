@@ -11,44 +11,44 @@
 namespace PtrDetail
 {
 
-[[nodiscard]] inline String FormatPointer(std::uintptr_t Value)
-{
-    if (Value == 0)
+    [[nodiscard]] inline String FormatPointer(std::uintptr_t Value)
     {
-        return String{"0"};
+        if (Value == 0)
+        {
+            return String{"0"};
+        }
+
+        char Buffer[2 + sizeof(std::uintptr_t) * 2];
+        Buffer[0] = '0';
+        Buffer[1] = 'x';
+        const auto [End, ErrorCode] = std::to_chars(Buffer + 2, Buffer + std::size(Buffer), Value, 16);
+        (void)ErrorCode;
+        return String{Buffer, static_cast<String::SizeType>(End - Buffer)};
     }
 
-    char Buffer[2 + sizeof(std::uintptr_t) * 2];
-    Buffer[0] = '0';
-    Buffer[1] = 'x';
-    const auto [End, ErrorCode] = std::to_chars(Buffer + 2, Buffer + std::size(Buffer), Value, 16);
-    (void)ErrorCode;
-    return String{Buffer, static_cast<String::SizeType>(End - Buffer)};
-}
-
-[[nodiscard]] inline String FormatPointer(std::intptr_t Value)
-{
-    if (Value == 0)
+    [[nodiscard]] inline String FormatPointer(std::intptr_t Value)
     {
-        return String{"0"};
-    }
+        if (Value == 0)
+        {
+            return String{"0"};
+        }
 
-    char Buffer[3 + sizeof(std::uintptr_t) * 2];
-    std::size_t PrefixLength = 0;
-    if (Value < 0)
-    {
-        Buffer[0] = '-';
-        PrefixLength = 1;
-        Value = -Value;
-    }
+        char Buffer[3 + sizeof(std::uintptr_t) * 2];
+        std::size_t PrefixLength = 0;
+        if (Value < 0)
+        {
+            Buffer[0] = '-';
+            PrefixLength = 1;
+            Value = -Value;
+        }
 
-    Buffer[PrefixLength + 0] = '0';
-    Buffer[PrefixLength + 1] = 'x';
-    const auto [End, ErrorCode] =
-        std::to_chars(Buffer + PrefixLength + 2, Buffer + std::size(Buffer), static_cast<std::uintptr_t>(Value), 16);
-    (void)ErrorCode;
-    return String{Buffer, static_cast<String::SizeType>(End - Buffer)};
-}
+        Buffer[PrefixLength + 0] = '0';
+        Buffer[PrefixLength + 1] = 'x';
+        const auto [End, ErrorCode] = std::to_chars(
+            Buffer + PrefixLength + 2, Buffer + std::size(Buffer), static_cast<std::uintptr_t>(Value), 16);
+        (void)ErrorCode;
+        return String{Buffer, static_cast<String::SizeType>(End - Buffer)};
+    }
 
 } // namespace PtrDetail
 
@@ -73,10 +73,7 @@ public:
 
     constexpr UIntPtr() noexcept = default;
 
-    constexpr explicit UIntPtr(std::uintptr_t InValue) noexcept
-        : Value(InValue)
-    {
-    }
+    constexpr explicit UIntPtr(std::uintptr_t InValue) noexcept : Value(InValue) {}
 
     [[nodiscard]] constexpr explicit operator std::uintptr_t() const noexcept
     {
@@ -134,15 +131,9 @@ public:
 
     constexpr IntPtr() noexcept = default;
 
-    constexpr explicit IntPtr(std::intptr_t InValue) noexcept
-        : Value(InValue)
-    {
-    }
+    constexpr explicit IntPtr(std::intptr_t InValue) noexcept : Value(InValue) {}
 
-    constexpr explicit IntPtr(UIntPtr Pointer) noexcept
-        : Value(static_cast<std::intptr_t>(Pointer.Value))
-    {
-    }
+    constexpr explicit IntPtr(UIntPtr Pointer) noexcept : Value(static_cast<std::intptr_t>(Pointer.Value)) {}
 
     [[nodiscard]] constexpr explicit operator std::intptr_t() const noexcept
     {

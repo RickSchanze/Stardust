@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Core/Memory/MiAllocator.h"
-#include "Core/String/StringView.h"
-
-#include <spdlog/fmt/fmt.h>
-
 #include <functional>
 #include <string>
 #include <utility>
+
+#include <spdlog/fmt/fmt.h>
+
+#include "Core/Memory/MiAllocator.h"
+#include "Core/String/StringView.h"
 
 class String
 {
@@ -38,27 +38,17 @@ public:
     ~String() = default;
 
     // 禁止从字面量 / C 字符串隐式构造；允许显式构造
-    explicit String(const char* Data)
-        : mData(Data == nullptr ? "" : Data)
-    {
-    }
+    explicit String(const char* Data) : mData(Data == nullptr ? "" : Data) {}
 
-    explicit String(const char* Data, SizeType Size)
-        : mData(Data == nullptr ? ConstPointer("") : Data, Size)
-    {
-    }
+    explicit String(const char* Data, SizeType Size) : mData(Data == nullptr ? ConstPointer("") : Data, Size) {}
 
     template <std::size_t N>
-    explicit String(const char (&Literal)[N])
-        : mData(Literal, N > 0 ? N - 1 : 0)
+    explicit String(const char (&Literal)[N]) : mData(Literal, N > 0 ? N - 1 : 0)
     {
     }
 
     // 从视图拷贝（可隐式：拥有内存的自然转换）
-    String(StringView View)
-        : mData(View.Data(), View.Size())
-    {
-    }
+    String(StringView View) : mData(View.Data(), View.Size()) {}
 
     String& operator=(StringView View)
     {

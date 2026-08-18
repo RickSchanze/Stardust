@@ -38,20 +38,11 @@ public:
 
     Array() = default;
 
-    explicit Array(SizeType Count)
-        : mData(Count)
-    {
-    }
+    explicit Array(SizeType Count) : mData(Count) {}
 
-    Array(SizeType Count, const T& Value)
-        : mData(Count, Value)
-    {
-    }
+    Array(SizeType Count, const T& Value) : mData(Count, Value) {}
 
-    Array(std::initializer_list<T> List)
-        : mData(List)
-    {
-    }
+    Array(std::initializer_list<T> List) : mData(List) {}
 
     Array(Span<const T> View)
     {
@@ -274,9 +265,8 @@ public:
         {
             Assert(Count <= mData.size() - Index);
         }
-        mData.erase(
-            mData.begin() + static_cast<DifferenceType>(Index),
-            mData.begin() + static_cast<DifferenceType>(Index + Count));
+        mData.erase(mData.begin() + static_cast<DifferenceType>(Index),
+                    mData.begin() + static_cast<DifferenceType>(Index + Count));
     }
 
     void RemoveAtSwap(SizeType Index)

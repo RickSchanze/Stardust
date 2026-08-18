@@ -28,36 +28,20 @@ public:
 
     constexpr Span() noexcept = default;
 
-    constexpr Span(std::nullptr_t) noexcept
-        : mData(nullptr)
-        , mSize(0)
-    {
-    }
+    constexpr Span(std::nullptr_t) noexcept : mData(nullptr), mSize(0) {}
 
-    constexpr Span(T* Data, SizeType Size) noexcept
-        : mData(Data)
-        , mSize(Size)
-    {
-    }
+    constexpr Span(T* Data, SizeType Size) noexcept : mData(Data), mSize(Size) {}
 
-    constexpr Span(T* Begin, T* End) noexcept
-        : mData(Begin)
-        , mSize(static_cast<SizeType>(End - Begin))
-    {
-    }
+    constexpr Span(T* Begin, T* End) noexcept : mData(Begin), mSize(static_cast<SizeType>(End - Begin)) {}
 
     template <std::size_t N>
-    constexpr Span(T (&Array)[N]) noexcept
-        : mData(Array)
-        , mSize(N)
+    constexpr Span(T (&Array)[N]) noexcept : mData(Array), mSize(N)
     {
     }
 
     template <typename U>
         requires std::is_convertible_v<U*, T*>
-    constexpr Span(const Span<U>& Other) noexcept
-        : mData(Other.Data())
-        , mSize(Other.Num())
+    constexpr Span(const Span<U>& Other) noexcept : mData(Other.Data()), mSize(Other.Num())
     {
     }
 
@@ -191,7 +175,7 @@ public:
     }
 
     constexpr void Fill(const T& Value) const
-        requires (!std::is_const_v<T>)
+        requires(!std::is_const_v<T>)
     {
         for (SizeType Index = 0; Index < mSize; ++Index)
         {
@@ -200,7 +184,7 @@ public:
     }
 
     constexpr void Clear() const
-        requires (!std::is_const_v<T>)
+        requires(!std::is_const_v<T>)
     {
         for (SizeType Index = 0; Index < mSize; ++Index)
         {

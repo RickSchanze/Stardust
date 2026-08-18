@@ -20,15 +20,9 @@ namespace RHI
     public:
         GPUResourceWithDesc() = default;
 
-        explicit GPUResourceWithDesc(const TDesc& InDesc)
-            : mDesc(InDesc)
-        {
-        }
+        explicit GPUResourceWithDesc(const TDesc& InDesc) : mDesc(InDesc) {}
 
-        explicit GPUResourceWithDesc(TDesc&& InDesc)
-            : mDesc(std::move(InDesc))
-        {
-        }
+        explicit GPUResourceWithDesc(TDesc&& InDesc) : mDesc(std::move(InDesc)) {}
 
         [[nodiscard]] const TDesc& GetDesc() const noexcept
         {
@@ -326,7 +320,8 @@ namespace RHI
     [[nodiscard]] bool ValidateTextureViewDesc(const TextureViewDesc& Desc, String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidateSamplerDesc(const SamplerDesc& Desc, String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidateShaderDesc(const ShaderDesc& Desc, String* ErrorMessage = nullptr);
-    [[nodiscard]] bool ValidateDescriptorSetLayoutDesc(const DescriptorSetLayoutDesc& Desc, String* ErrorMessage = nullptr);
+    [[nodiscard]] bool ValidateDescriptorSetLayoutDesc(const DescriptorSetLayoutDesc& Desc,
+                                                       String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidatePipelineLayoutDesc(const PipelineLayoutDesc& Desc, String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidateRenderPassDesc(const RenderPassDesc& Desc, String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& Desc, String* ErrorMessage = nullptr);

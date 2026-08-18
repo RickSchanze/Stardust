@@ -10,11 +10,7 @@
 #include "Core/Debug/Debug.h"
 #include "Core/Memory/MiAllocator.h"
 
-template <
-    typename TKey,
-    typename TValue,
-    typename THasher = std::hash<TKey>,
-    typename TKeyEqual = std::equal_to<TKey>>
+template <typename TKey, typename TValue, typename THasher = std::hash<TKey>, typename TKeyEqual = std::equal_to<TKey>>
 class HashMap
 {
     using Storage = std::unordered_map<TKey, TValue, THasher, TKeyEqual, MiAllocator<std::pair<const TKey, TValue>>>;
@@ -31,10 +27,7 @@ public:
 
     HashMap() = default;
 
-    HashMap(std::initializer_list<ElementType> List)
-        : mData(List)
-    {
-    }
+    HashMap(std::initializer_list<ElementType> List) : mData(List) {}
 
     [[nodiscard]] SizeType Num() const noexcept
     {

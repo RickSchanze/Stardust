@@ -28,8 +28,7 @@ public:
     constexpr Matrix4x4(const Vector4<T>& Column0,
                         const Vector4<T>& Column1,
                         const Vector4<T>& Column2,
-                        const Vector4<T>& Column3) noexcept
-        : Columns{Column0, Column1, Column2, Column3}
+                        const Vector4<T>& Column3) noexcept : Columns{Column0, Column1, Column2, Column3}
     {
     }
 
@@ -137,19 +136,22 @@ public:
         return Scaling(Vector3<T>{Scale});
     }
 
-    [[nodiscard]] static Matrix4x4 LookAt(const Vector3<T>& Eye, const Vector3<T>& Center, const Vector3<T>& Up) noexcept
+    [[nodiscard]] static Matrix4x4
+    LookAt(const Vector3<T>& Eye, const Vector3<T>& Center, const Vector3<T>& Up) noexcept
         requires std::floating_point<T>
     {
         return Matrix4x4{glm::lookAt(Eye.AsGlm(), Center.AsGlm(), Up.AsGlm())};
     }
 
-    [[nodiscard]] static Matrix4x4 LookAtRH(const Vector3<T>& Eye, const Vector3<T>& Center, const Vector3<T>& Up) noexcept
+    [[nodiscard]] static Matrix4x4
+    LookAtRH(const Vector3<T>& Eye, const Vector3<T>& Center, const Vector3<T>& Up) noexcept
         requires std::floating_point<T>
     {
         return Matrix4x4{glm::lookAtRH(Eye.AsGlm(), Center.AsGlm(), Up.AsGlm())};
     }
 
-    [[nodiscard]] static Matrix4x4 LookAtLH(const Vector3<T>& Eye, const Vector3<T>& Center, const Vector3<T>& Up) noexcept
+    [[nodiscard]] static Matrix4x4
+    LookAtLH(const Vector3<T>& Eye, const Vector3<T>& Center, const Vector3<T>& Up) noexcept
         requires std::floating_point<T>
     {
         return Matrix4x4{glm::lookAtLH(Eye.AsGlm(), Center.AsGlm(), Up.AsGlm())};

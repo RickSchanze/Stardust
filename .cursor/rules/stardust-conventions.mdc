@@ -43,6 +43,7 @@ alwaysApply: true
 ## 格式
 
 - 遵循根目录 `.clang-format`（Allman 大括号、4 空格；初始化列表逗号在行尾，禁止 `, Foo` 式 Leading comma）
+- **每次写完/改完 `Source/` 下 C/C++ 文件后必须立刻 `clang-format -i --style=file`**，详见 `clang-format.mdc`；禁止只改内容不格式化
 - 命名由 `.clang-tidy` 的 `readability-identifier-naming` 约束
 
 ## CMake / 第三方

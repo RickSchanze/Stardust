@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mimalloc.h>
-
 #include <cstddef>
 #include <new>
 #include <utility>
+
+#include <mimalloc.h>
 
 [[nodiscard]] inline void* Malloc(std::size_t Size) noexcept
 {

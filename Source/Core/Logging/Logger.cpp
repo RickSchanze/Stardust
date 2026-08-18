@@ -30,18 +30,18 @@ spdlog::level::level_enum Logger::ToSpdlogLevel(LogLevel InLevel)
 {
     switch (InLevel)
     {
-    case LogLevel::Debug:
-        return spdlog::level::debug;
-    case LogLevel::Info:
-        return spdlog::level::info;
-    case LogLevel::Warn:
-        return spdlog::level::warn;
-    case LogLevel::Error:
-        return spdlog::level::err;
-    case LogLevel::Critical:
-        return spdlog::level::critical;
-    case LogLevel::Assert:
-        return spdlog::level::critical;
+        case LogLevel::Debug:
+            return spdlog::level::debug;
+        case LogLevel::Info:
+            return spdlog::level::info;
+        case LogLevel::Warn:
+            return spdlog::level::warn;
+        case LogLevel::Error:
+            return spdlog::level::err;
+        case LogLevel::Critical:
+            return spdlog::level::critical;
+        case LogLevel::Assert:
+            return spdlog::level::critical;
     }
     return spdlog::level::info;
 }

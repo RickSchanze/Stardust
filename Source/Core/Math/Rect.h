@@ -14,17 +14,9 @@ public:
 
     constexpr Rect() noexcept = default;
 
-    constexpr Rect(const Vector2<T>& InMin, const Vector2<T>& InMax) noexcept
-        : Min(InMin),
-          Max(InMax)
-    {
-    }
+    constexpr Rect(const Vector2<T>& InMin, const Vector2<T>& InMax) noexcept : Min(InMin), Max(InMax) {}
 
-    constexpr Rect(T MinX, T MinY, T MaxX, T MaxY) noexcept
-        : Min(MinX, MinY),
-          Max(MaxX, MaxY)
-    {
-    }
+    constexpr Rect(T MinX, T MinY, T MaxX, T MaxY) noexcept : Min(MinX, MinY), Max(MaxX, MaxY) {}
 
     [[nodiscard]] static constexpr Rect FromPositionSize(const Vector2<T>& Position, const Vector2<T>& Size) noexcept
     {
@@ -210,15 +202,10 @@ public:
 
     constexpr Rect3D() noexcept = default;
 
-    constexpr Rect3D(const Vector3<T>& InMin, const Vector3<T>& InMax) noexcept
-        : Min(InMin),
-          Max(InMax)
-    {
-    }
+    constexpr Rect3D(const Vector3<T>& InMin, const Vector3<T>& InMax) noexcept : Min(InMin), Max(InMax) {}
 
-    constexpr Rect3D(T MinX, T MinY, T MinZ, T MaxX, T MaxY, T MaxZ) noexcept
-        : Min(MinX, MinY, MinZ),
-          Max(MaxX, MaxY, MaxZ)
+    constexpr Rect3D(T MinX, T MinY, T MinZ, T MaxX, T MaxY, T MaxZ) noexcept :
+        Min(MinX, MinY, MinZ), Max(MaxX, MaxY, MaxZ)
     {
     }
 

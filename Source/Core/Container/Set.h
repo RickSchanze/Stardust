@@ -24,10 +24,7 @@ public:
 
     Set() = default;
 
-    Set(std::initializer_list<T> List)
-        : mData(List)
-    {
-    }
+    Set(std::initializer_list<T> List) : mData(List) {}
 
     [[nodiscard]] SizeType Num() const noexcept
     {

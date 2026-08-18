@@ -27,36 +27,21 @@ public:
 
     constexpr StringView(std::nullptr_t) = delete;
 
-    constexpr StringView(const char* Data) noexcept
-        : mData(Data)
-        , mSize(Data == nullptr ? 0 : CStringLength(Data))
-    {
-    }
+    constexpr StringView(const char* Data) noexcept : mData(Data), mSize(Data == nullptr ? 0 : CStringLength(Data)) {}
 
-    constexpr StringView(const char* Data, SizeType Size) noexcept
-        : mData(Data)
-        , mSize(Size)
-    {
-    }
+    constexpr StringView(const char* Data, SizeType Size) noexcept : mData(Data), mSize(Size) {}
 
-    constexpr StringView(const char* Begin, const char* End) noexcept
-        : mData(Begin)
-        , mSize(static_cast<SizeType>(End - Begin))
+    constexpr StringView(const char* Begin, const char* End) noexcept :
+        mData(Begin), mSize(static_cast<SizeType>(End - Begin))
     {
     }
 
     template <std::size_t N>
-    constexpr StringView(const char (&Literal)[N]) noexcept
-        : mData(Literal)
-        , mSize(N > 0 ? N - 1 : 0)
+    constexpr StringView(const char (&Literal)[N]) noexcept : mData(Literal), mSize(N > 0 ? N - 1 : 0)
     {
     }
 
-    constexpr StringView(std::string_view View) noexcept
-        : mData(View.data())
-        , mSize(View.size())
-    {
-    }
+    constexpr StringView(std::string_view View) noexcept : mData(View.data()), mSize(View.size()) {}
 
     [[nodiscard]] constexpr ConstPointer Data() const noexcept
     {
@@ -440,7 +425,7 @@ private:
 
     [[nodiscard]] static constexpr bool IsSpace(char Character) noexcept
     {
-        return Character == ' ' || Character == '\t' || Character == '\n' || Character == '\v' ||
-               Character == '\f' || Character == '\r';
+        return Character == ' ' || Character == '\t' || Character == '\n' || Character == '\v' || Character == '\f' ||
+               Character == '\r';
     }
 };

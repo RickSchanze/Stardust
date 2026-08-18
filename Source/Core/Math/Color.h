@@ -68,60 +68,39 @@ public:
     constexpr Color() noexcept = default;
 
     template <ColorFloatArg InR, ColorFloatArg InG, ColorFloatArg InB, ColorFloatArg InA = float>
-    constexpr Color(InR InRed, InG InGreen, InB InBlue, InA InAlpha = 1.0f) noexcept
-        : R(ConvertColorChannel<T>(InRed)),
-          G(ConvertColorChannel<T>(InGreen)),
-          B(ConvertColorChannel<T>(InBlue)),
-          A(ConvertColorChannel<T>(InAlpha))
+    constexpr Color(InR InRed, InG InGreen, InB InBlue, InA InAlpha = 1.0f) noexcept :
+        R(ConvertColorChannel<T>(InRed)), G(ConvertColorChannel<T>(InGreen)), B(ConvertColorChannel<T>(InBlue)),
+        A(ConvertColorChannel<T>(InAlpha))
     {
     }
 
     template <ColorByteArg InR, ColorByteArg InG, ColorByteArg InB, ColorByteArg InA = int>
-    constexpr Color(InR InRed, InG InGreen, InB InBlue, InA InAlpha = 255) noexcept
-        : R(ConvertColorChannel<T>(InRed)),
-          G(ConvertColorChannel<T>(InGreen)),
-          B(ConvertColorChannel<T>(InBlue)),
-          A(ConvertColorChannel<T>(InAlpha))
+    constexpr Color(InR InRed, InG InGreen, InB InBlue, InA InAlpha = 255) noexcept :
+        R(ConvertColorChannel<T>(InRed)), G(ConvertColorChannel<T>(InGreen)), B(ConvertColorChannel<T>(InBlue)),
+        A(ConvertColorChannel<T>(InAlpha))
     {
     }
 
-    constexpr explicit Color(float Gray, float InAlpha = 1.0f) noexcept
-        : Color(Gray, Gray, Gray, InAlpha)
+    constexpr explicit Color(float Gray, float InAlpha = 1.0f) noexcept : Color(Gray, Gray, Gray, InAlpha) {}
+
+    constexpr explicit Color(int Gray, int InAlpha = 255) noexcept : Color(Gray, Gray, Gray, InAlpha) {}
+
+    constexpr Color(const Vector3<float>& Rgb, float InAlpha = 1.0f) noexcept : Color(Rgb.X, Rgb.Y, Rgb.Z, InAlpha) {}
+
+    constexpr Color(const Vector4<float>& Rgba) noexcept : Color(Rgba.X, Rgba.Y, Rgba.Z, Rgba.W) {}
+
+    constexpr Color(const Vector3<std::uint8_t>& Rgb, std::uint8_t InAlpha = 255) noexcept :
+        Color(Rgb.X, Rgb.Y, Rgb.Z, InAlpha)
     {
     }
 
-    constexpr explicit Color(int Gray, int InAlpha = 255) noexcept
-        : Color(Gray, Gray, Gray, InAlpha)
-    {
-    }
-
-    constexpr Color(const Vector3<float>& Rgb, float InAlpha = 1.0f) noexcept
-        : Color(Rgb.X, Rgb.Y, Rgb.Z, InAlpha)
-    {
-    }
-
-    constexpr Color(const Vector4<float>& Rgba) noexcept
-        : Color(Rgba.X, Rgba.Y, Rgba.Z, Rgba.W)
-    {
-    }
-
-    constexpr Color(const Vector3<std::uint8_t>& Rgb, std::uint8_t InAlpha = 255) noexcept
-        : Color(Rgb.X, Rgb.Y, Rgb.Z, InAlpha)
-    {
-    }
-
-    constexpr Color(const Vector4<std::uint8_t>& Rgba) noexcept
-        : Color(Rgba.X, Rgba.Y, Rgba.Z, Rgba.W)
-    {
-    }
+    constexpr Color(const Vector4<std::uint8_t>& Rgba) noexcept : Color(Rgba.X, Rgba.Y, Rgba.Z, Rgba.W) {}
 
     template <ColorChannel U>
-        requires (!std::same_as<U, T>)
-    constexpr Color(const Color<U>& Other) noexcept
-        : R(ConvertColorChannel<T>(Other.R)),
-          G(ConvertColorChannel<T>(Other.G)),
-          B(ConvertColorChannel<T>(Other.B)),
-          A(ConvertColorChannel<T>(Other.A))
+        requires(!std::same_as<U, T>)
+    constexpr Color(const Color<U>& Other) noexcept :
+        R(ConvertColorChannel<T>(Other.R)), G(ConvertColorChannel<T>(Other.G)), B(ConvertColorChannel<T>(Other.B)),
+        A(ConvertColorChannel<T>(Other.A))
     {
     }
 
