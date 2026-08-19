@@ -39,9 +39,9 @@ namespace RHI
         static constexpr UInt32 InvalidIndex{~0u};
 
         [[nodiscard]] GPUHandle Allocate();
-        void Destroy(GPUHandle Handle);
+        void Destroy(const GPUHandle Handle);
 
-        [[nodiscard]] bool IsValid(GPUHandle Handle) const noexcept;
+        [[nodiscard]] bool IsValid(const GPUHandle Handle) const noexcept;
 
         [[nodiscard]] UInt32 LiveCount() const noexcept
         {
@@ -53,15 +53,15 @@ namespace RHI
             return static_cast<UInt32>(mSlots.Num());
         }
 
-        void Reserve(UInt32 Count);
+        void Reserve(const UInt32 Count);
         void Reset();
 
     private:
         [[nodiscard]] GPUHandle AllocateFromFreeList();
         [[nodiscard]] GPUHandle AllocateNewSlot();
 
-        [[nodiscard]] bool IsIndexInRange(UInt32 Index) const noexcept;
-        [[nodiscard]] static bool IsSlotLive(const GPUHandleSlot& Slot, UInt32 Generation) noexcept;
+        [[nodiscard]] bool IsIndexInRange(const UInt32 Index) const noexcept;
+        [[nodiscard]] static bool IsSlotLive(const GPUHandleSlot& Slot, const UInt32 Generation) noexcept;
 
         static void BumpGeneration(UInt32& Generation) noexcept;
 

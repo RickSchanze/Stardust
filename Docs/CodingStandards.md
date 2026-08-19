@@ -138,6 +138,25 @@ static constexpr auto TypeValue = CommandType::Draw;
 
 CLion 检查：`CppUseAuto`。
 
+### 值类型形参 `const`
+
+函数/方法的**值传递**形参（基础数值类型、枚举、按值传递的 Handle 等）若在函数体内不修改，必须声明为 `const`：
+
+```cpp
+// 正确
+void Destroy(const BufferHandle Handle);
+void Draw(const UInt32 VertexCount, const UInt32 InstanceCount = 1);
+bool IsValid(const GPUHandle Handle) const noexcept;
+
+// 错误
+void Destroy(BufferHandle Handle);
+void Draw(UInt32 VertexCount);
+```
+
+引用形参与指针形参遵循各自的 const-correctness 规则，本条仅针对值传递形参。
+
+CLion 检查：`CppParameterMayBeConst`（Common Practices and Code Improvements）。
+
 项目配置：`.idea/inspectionProfiles/Project_Default.xml`。
 
 ## 7. 第三方库

@@ -575,7 +575,7 @@ namespace RHI
             Record(EndRenderPassCommand{.Header = {.Type = EndRenderPassCommand::TypeValue}});
         }
 
-        void BindGraphicsPipeline(GraphicsPipelineHandle Pipeline)
+        void BindGraphicsPipeline(const GraphicsPipelineHandle Pipeline)
         {
             Record(BindGraphicsPipelineCommand{
                 .Header = {.Type = BindGraphicsPipelineCommand::TypeValue},
@@ -583,7 +583,7 @@ namespace RHI
             });
         }
 
-        void BindComputePipeline(ComputePipelineHandle Pipeline)
+        void BindComputePipeline(const ComputePipelineHandle Pipeline)
         {
             Record(BindComputePipelineCommand{
                 .Header = {.Type = BindComputePipelineCommand::TypeValue},
@@ -596,7 +596,7 @@ namespace RHI
             Record(Command);
         }
 
-        void BindIndexBuffer(BufferHandle Buffer, UInt64 Offset = 0, IndexFormat Format = IndexFormat::Uint32)
+        void BindIndexBuffer(const BufferHandle Buffer, const UInt64 Offset = 0, const IndexFormat Format = IndexFormat::Uint32)
         {
             Record(BindIndexBufferCommand{
                 .Header = {.Type = BindIndexBufferCommand::TypeValue},
@@ -616,7 +616,7 @@ namespace RHI
             Record(Command);
         }
 
-        void SetViewport(const Viewport& ViewportValue, UInt32 FirstViewport = 0)
+        void SetViewport(const Viewport& ViewportValue, const UInt32 FirstViewport = 0)
         {
             SetViewportCommand Command{
                 .Header = {.Type = SetViewportCommand::TypeValue},
@@ -632,7 +632,7 @@ namespace RHI
             Record(Command);
         }
 
-        void SetScissor(const Recti& Scissor, UInt32 FirstScissor = 0)
+        void SetScissor(const Recti& Scissor, const UInt32 FirstScissor = 0)
         {
             SetScissorCommand Command{
                 .Header = {.Type = SetScissorCommand::TypeValue},
@@ -656,7 +656,7 @@ namespace RHI
             });
         }
 
-        void SetDepthBias(Float ConstantFactor, Float Clamp, Float SlopeFactor)
+        void SetDepthBias(const Float ConstantFactor, const Float Clamp, const Float SlopeFactor)
         {
             Record(SetDepthBiasCommand{
                 .Header = {.Type = SetDepthBiasCommand::TypeValue},
@@ -666,7 +666,7 @@ namespace RHI
             });
         }
 
-        void SetStencilReference(StencilFace Face, UInt32 Reference)
+        void SetStencilReference(const StencilFace Face, const UInt32 Reference)
         {
             Record(SetStencilReferenceCommand{
                 .Header = {.Type = SetStencilReferenceCommand::TypeValue},
@@ -675,7 +675,7 @@ namespace RHI
             });
         }
 
-        void Draw(UInt32 VertexCount, UInt32 InstanceCount = 1, UInt32 FirstVertex = 0, UInt32 FirstInstance = 0)
+        void Draw(const UInt32 VertexCount, const UInt32 InstanceCount = 1, const UInt32 FirstVertex = 0, const UInt32 FirstInstance = 0)
         {
             Record(DrawCommand{
                 .Header = {.Type = DrawCommand::TypeValue},
@@ -686,11 +686,11 @@ namespace RHI
             });
         }
 
-        void DrawIndexed(UInt32 IndexCount,
-                         UInt32 InstanceCount = 1,
-                         UInt32 FirstIndex = 0,
-                         Int32 VertexOffset = 0,
-                         UInt32 FirstInstance = 0)
+        void DrawIndexed(const UInt32 IndexCount,
+                         const UInt32 InstanceCount = 1,
+                         const UInt32 FirstIndex = 0,
+                         const Int32 VertexOffset = 0,
+                         const UInt32 FirstInstance = 0)
         {
             Record(DrawIndexedCommand{
                 .Header = {.Type = DrawIndexedCommand::TypeValue},
@@ -712,7 +712,7 @@ namespace RHI
             Record(Command);
         }
 
-        void Dispatch(UInt32 GroupCountX, UInt32 GroupCountY = 1, UInt32 GroupCountZ = 1)
+        void Dispatch(const UInt32 GroupCountX, const UInt32 GroupCountY = 1, const UInt32 GroupCountZ = 1)
         {
             Record(DispatchCommand{
                 .Header = {.Type = DispatchCommand::TypeValue},
@@ -722,7 +722,7 @@ namespace RHI
             });
         }
 
-        void DispatchIndirect(BufferHandle Buffer, UInt64 Offset = 0)
+        void DispatchIndirect(const BufferHandle Buffer, const UInt64 Offset = 0)
         {
             Record(DispatchIndirectCommand{
                 .Header = {.Type = DispatchIndirectCommand::TypeValue},

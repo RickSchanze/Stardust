@@ -21,25 +21,25 @@ namespace RHI
             return Handle;
         }
 
-        void Destroy(GPUHandle Handle)
+        void Destroy(const GPUHandle Handle)
         {
             Assert(IsValid(Handle));
             mResources[Handle.Index] = T{};
             mHandles.Destroy(Handle);
         }
 
-        [[nodiscard]] bool IsValid(GPUHandle Handle) const noexcept
+        [[nodiscard]] bool IsValid(const GPUHandle Handle) const noexcept
         {
             return mHandles.IsValid(Handle);
         }
 
-        [[nodiscard]] T& Get(GPUHandle Handle)
+        [[nodiscard]] T& Get(const GPUHandle Handle)
         {
             Assert(IsValid(Handle));
             return mResources[Handle.Index];
         }
 
-        [[nodiscard]] const T& Get(GPUHandle Handle) const
+        [[nodiscard]] const T& Get(const GPUHandle Handle) const
         {
             Assert(IsValid(Handle));
             return mResources[Handle.Index];
@@ -55,7 +55,7 @@ namespace RHI
             return mHandles.Capacity();
         }
 
-        void Reserve(UInt32 Count)
+        void Reserve(const UInt32 Count)
         {
             mHandles.Reserve(Count);
             mResources.Reserve(Count);

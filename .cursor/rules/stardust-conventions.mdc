@@ -55,7 +55,11 @@ alwaysApply: true
 - **`auto`**：局部变量、以及 `static constexpr` 成员在右侧类型可明确推断时使用 `auto`（CLion `CppUseAuto`）
   - 正确：`const auto Offset = AlignCommandOffset(...);`、`static constexpr auto TypeValue = CommandType::Draw;`
   - 例外：需要明确接口类型、窄化风险、或 `auto` 降低可读性时保留显式类型
-- CLion 项目检查已启用：`CppUseAuto`、`CppUseDesignatedInitializers`（见 `.idea/inspectionProfiles/Project_Default.xml`）
+- **值类型形参加 `const`**（CLion `CppParameterMayBeConst`）：函数/方法的值类型形参（基础数值类型、枚举、按值传递的 Handle 等）若在函数体内不被修改，必须声明为 `const`
+  - 正确：`void Destroy(const BufferHandle Handle);`、`void Draw(const UInt32 VertexCount, const UInt32 InstanceCount = 1);`
+  - 错误：`void Destroy(BufferHandle Handle);`、`void Draw(UInt32 VertexCount);`
+  - 注意：引用 / 指针形参遵循各自 const-correctness 规则；本条仅针对**值传递**的形参
+- CLion 项目检查已启用：`CppUseAuto`、`CppUseDesignatedInitializers`、`CppParameterMayBeConst`（见 `.idea/inspectionProfiles/Project_Default.xml`）
 - **clang-tidy 例外**：`Source/` 外不检查；容器/分配器的 STL 接口名（`begin`/`end`/`value_type`/`allocate` 等）保持标准库命名，见 `.clang-tidy` 的 `*IgnoredRegexp`
 
 ## CMake / 第三方
