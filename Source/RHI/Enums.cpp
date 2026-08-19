@@ -6,6 +6,10 @@ namespace RHI
     static_assert(Reflection::IsEnumFlag<BufferUsageFlag>);
     static_assert(Reflection::IsEnumFlag<AccessFlag>);
     static_assert(Reflection::IsEnumFlag<DescriptorPoolCreateFlag>);
+    static_assert(Reflection::IsEnumFlag<CommandPoolCreateFlag>);
+    static_assert(Reflection::IsEnumFlag<CommandBufferUsageFlag>);
+    static_assert(!Reflection::IsEnumFlag<CommandBufferType>);
+    static_assert(!Reflection::IsEnumFlag<SubpassContents>);
     static_assert(!Reflection::IsEnumFlag<PixelFormat>);
     static_assert(!Reflection::IsEnumFlag<SampleCount>);
     static_assert(!Reflection::IsEnumFlag<CullMode>);

@@ -15,7 +15,7 @@ namespace RHI
         [[nodiscard]] bool IsAttachmentReferenceValid(const RenderPassAttachmentRef& Reference,
                                                       const UInt32 AttachmentCount)
         {
-            return Reference.Attachment == UnusedAttachmentIndex || Reference.Attachment < AttachmentCount;
+            return Reference.Attachment == gUnusedAttachmentIndex || Reference.Attachment < AttachmentCount;
         }
     } // namespace
 
@@ -304,7 +304,7 @@ namespace RHI
                 return false;
             }
 
-            if (Subpass.ColorAttachments.Empty() && Subpass.DepthStencilAttachment.Attachment == UnusedAttachmentIndex)
+            if (Subpass.ColorAttachments.Empty() && Subpass.DepthStencilAttachment.Attachment == gUnusedAttachmentIndex)
             {
                 SetValidationError(ErrorMessage,
                                    "Each subpass must bind at least one color or depth-stencil attachment.");
@@ -352,7 +352,7 @@ namespace RHI
                 return false;
             }
 
-            for (const UInt32 PreserveAttachment : Subpass.PreserveAttachments)
+            for (const auto PreserveAttachment : Subpass.PreserveAttachments)
             {
                 if (PreserveAttachment >= AttachmentCount)
                 {
@@ -365,13 +365,13 @@ namespace RHI
 
         for (const RenderPassSubpassDependencyDesc& Dependency : Desc.Dependencies)
         {
-            if (Dependency.SourceSubpass != ExternalSubpassIndex && Dependency.SourceSubpass >= SubpassCount)
+            if (Dependency.SourceSubpass != gExternalSubpassIndex && Dependency.SourceSubpass >= SubpassCount)
             {
                 SetValidationError(ErrorMessage, "Render pass dependency source subpass index is out of range.");
                 return false;
             }
 
-            if (Dependency.DestinationSubpass != ExternalSubpassIndex && Dependency.DestinationSubpass >= SubpassCount)
+            if (Dependency.DestinationSubpass != gExternalSubpassIndex && Dependency.DestinationSubpass >= SubpassCount)
             {
                 SetValidationError(ErrorMessage, "Render pass dependency destination subpass index is out of range.");
                 return false;

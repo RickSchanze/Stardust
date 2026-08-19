@@ -703,6 +703,46 @@ namespace RHI
         SimultaneousUse = 1u << 2,
     };
 
+    enum class[[= EnumFlag()]] CommandPoolCreateFlag : std::uint32_t
+    {
+        None = 0,
+        Transient = 1u << 0,
+        ResetCommandBuffer = 1u << 1,
+        Protected = 1u << 2,
+    };
+
+    enum class[[= EnumFlag()]] CommandPoolResetFlag : std::uint32_t
+    {
+        None = 0,
+        ReleaseResources = 1u << 0,
+    };
+
+    enum class[[= EnumFlag()]] CommandBufferResetFlag : std::uint32_t
+    {
+        None = 0,
+        ReleaseResources = 1u << 0,
+    };
+
+    enum class[[= EnumFlag()]] DependencyFlag : std::uint32_t
+    {
+        None = 0,
+        ByRegion = 1u << 0,
+        ViewLocal = 1u << 1,
+        DeviceGroup = 1u << 2,
+    };
+
+    enum class SubpassContents
+    {
+        Inline = 0,
+        SecondaryCommandBuffers = 1,
+    };
+
+    enum class Filter
+    {
+        Nearest = 0,
+        Linear = 1,
+    };
+
     enum class IndexFormat
     {
         Uint16 = 0,

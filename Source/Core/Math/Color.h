@@ -151,10 +151,10 @@ public:
 
     [[nodiscard]] static Color FromRgba32(std::uint32_t Rgba) noexcept
     {
-        const std::uint8_t InR = static_cast<std::uint8_t>((Rgba >> 24) & 0xFFu);
-        const std::uint8_t InG = static_cast<std::uint8_t>((Rgba >> 16) & 0xFFu);
-        const std::uint8_t InB = static_cast<std::uint8_t>((Rgba >> 8) & 0xFFu);
-        const std::uint8_t InA = static_cast<std::uint8_t>(Rgba & 0xFFu);
+        const auto InR = static_cast<std::uint8_t>((Rgba >> 24) & 0xFFu);
+        const auto InG = static_cast<std::uint8_t>((Rgba >> 16) & 0xFFu);
+        const auto InB = static_cast<std::uint8_t>((Rgba >> 8) & 0xFFu);
+        const auto InA = static_cast<std::uint8_t>(Rgba & 0xFFu);
         return {InR, InG, InB, InA};
     }
 

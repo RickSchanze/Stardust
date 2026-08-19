@@ -26,7 +26,7 @@ namespace RHI
 
     GPUHandle GPUHandlePool::AllocateFromFreeList()
     {
-        const UInt32 Index = mFreeHead;
+        const auto Index = mFreeHead;
         auto& [Generation, NextFree] = mSlots[Index];
         mFreeHead = NextFree;
         NextFree = InvalidIndex;

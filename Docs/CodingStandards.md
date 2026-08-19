@@ -1,6 +1,6 @@
 # Stardust 编码规范
 
-本文档与 `.cursor/rules/stardust-conventions.mdc`、`.clang-format`、`.clang-tidy` 保持一致。
+本文档与 `.cursor/rules/stardust-conventions.mdc`、`.cursor/rules/clang-format-and-tidy.mdc`、`.clang-format`、`.clang-tidy` 保持一致。
 
 ## 1. 语言与工具链
 
@@ -46,8 +46,10 @@ git -c http.proxy=http://127.0.0.1:7890 -c https.proxy=http://127.0.0.1:7890 sub
 | 局部变量 / 参数 | 大驼峰 | `int BufferCount` | `int bufferCount` |
 | public 成员（含 static） | 大驼峰，无前缀 | `int Width` / `static Device* Instance` | `int mWidth` |
 | protected / private（含 static） | `m` + 大驼峰 | `int mWidth` / `static Device* mInstance` | `int Width` / `static sInstance` |
-| 文件作用域全局 | `g` + 大驼峰 | `Engine* gEngine` | `Engine* engine` |
+| 文件作用域全局 / 命名空间 `inline constexpr` | `g` + 大驼峰 | `gCommandAlignment` | `CommandAlignment` |
 | 静态成员 | 无单独前缀，按访问属性 | 同上 | `sInstance` / `gMInstance` |
+
+命名空间内的 `inline constexpr` 常量同样视为全局常量，必须加 `g` 前缀（clang-tidy `GlobalConstantPrefix`）。
 
 ### 示例
 
@@ -97,10 +99,48 @@ RenderDevice* gPrimaryDevice = nullptr;
 ## 5. 格式化与静态检查
 
 - **clang-format**：Allman 大括号、缩进 4 空格、列宽 120、指针/引用贴类型左侧（`Type*`）；构造初始化列表与继承列表逗号在行尾（`BreakConstructorInitializers/BreakInheritanceList: AfterColon`），禁止 Leading comma
-- **clang-tidy**：`readability-identifier-naming` 按第 3 节规则检查。静态数据成员由 `ClassMember` 约束（工具限制，无法按 public/private 拆分）；`m` 前缀通过 `ClassMemberIgnoredRegexp` 放行，避免被误判成 `GlobalVariable` 而改成 `gMInstance`。
+- **clang-tidy**：`readability-identifier-naming` 按第 3 节规则检查；`HeaderFilterRegex` 仅覆盖 `Source/`。容器/分配器/STL 兼容接口（`begin`/`end`/`value_type`/`allocate`/`push_back` 等）见 `.clang-tidy` 的 `*IgnoredRegexp`，保持标准库命名。
+- **强制**：每次改完 `Source/` 下 C/C++ 文件后必须立刻跑 `clang-format` **与** `clang-tidy`（见 `.cursor/rules/clang-format-and-tidy.mdc`），两者都干净才能结束；禁止只改内容或只跑其中一个
 - CLion：启用 ClangFormat、Clang-Tidy，与仓库配置文件对齐
 
-## 6. 第三方库
+## 6. C++ 惯用法（CLion 检查）
+
+### 指定初始化（designated initializers）
+
+聚合类型 / POD struct 初始化时，**优先使用指定初始化**，尤其嵌套成员（如 `RHI::Command`、各类 `*Command`、Desc）。带成员函数的 class（如 `CommandBuffer`）不能整体 designated-init，应对其 struct 成员字段使用指定初始化。
+
+```cpp
+// 正确
+Command Header{.Type = TypeValue};
+DrawCommand{
+    .Header = {.Type = DrawCommand::TypeValue},
+    .VertexCount = 3,
+};
+
+// 错误
+Command Header{TypeValue};
+DrawCommand Command{};
+Command.VertexCount = 3;
+```
+
+CLion 检查：`CppUseDesignatedInitializers`（Common Practices and Code Improvements）。
+
+### `auto`
+
+局部变量、以及 `static constexpr` 成员在右侧类型可明确推断时使用 `auto`：
+
+```cpp
+const auto Offset = AlignCommandOffset(mCommands.Num());
+static constexpr auto TypeValue = CommandType::Draw;
+```
+
+以下情况保留显式类型：接口边界、窄化风险、`auto` 降低可读性。
+
+CLion 检查：`CppUseAuto`。
+
+项目配置：`.idea/inspectionProfiles/Project_Default.xml`。
+
+## 7. 第三方库
 
 **禁止 FetchContent。** 一律 git submodule + `add_subdirectory`。
 

@@ -5,7 +5,7 @@
 # 约定：static 按访问属性命名（private→m，public→无前缀）；用 ClassMemberIgnoredRegexp 接纳 m 前缀。
 Checks: '-*,readability-identifier-naming'
 WarningsAsErrors: ''
-HeaderFilterRegex: '.*'
+HeaderFilterRegex: '.*/Source/.*'
 FormatStyle: file
 CheckOptions:
   # 命名空间、类、结构体、枚举、类型别名：大驼峰
@@ -21,18 +21,24 @@ CheckOptions:
     value: CamelCase
   - key: readability-identifier-naming.TypeAliasCase
     value: CamelCase
+  - key: readability-identifier-naming.TypeAliasIgnoredRegexp
+    value: '^(value_type|size_type|difference_type|pointer|const_pointer|reference|const_reference|iterator|const_iterator|reverse_iterator|const_reverse_iterator)$'
   - key: readability-identifier-naming.TypedefCase
     value: CamelCase
+  - key: readability-identifier-naming.TypedefIgnoredRegexp
+    value: '^(value_type|size_type|difference_type|pointer|const_pointer|reference|const_reference|iterator|const_iterator|reverse_iterator|const_reverse_iterator)$'
   - key: readability-identifier-naming.ConceptCase
     value: CamelCase
 
   # 函数 / 方法：大驼峰（不含 C 入口 main）
   - key: readability-identifier-naming.FunctionCase
     value: CamelCase
+  - key: readability-identifier-naming.IgnoredFunctions
+    value: 'main;WinMain;wWinMain;allocate;deallocate;reallocate'
   - key: readability-identifier-naming.MethodCase
     value: CamelCase
-  - key: readability-identifier-naming.IgnoredFunctions
-    value: 'main;WinMain;wWinMain'
+  - key: readability-identifier-naming.MethodIgnoredRegexp
+    value: '^(begin|end|rbegin|rend|cbegin|cend|crbegin|crend|allocate|deallocate|reallocate|push_back|pop_back|emplace_back)$'
 
   # 局部变量、参数：大驼峰；C++26 占位符 `_` 可在同作用域重复声明
   - key: readability-identifier-naming.LocalVariableCase
@@ -71,11 +77,13 @@ CheckOptions:
   - key: readability-identifier-naming.ClassConstantPrefix
     value: ''
 
-  # 文件作用域全局：g + 大驼峰
+  # 文件作用域全局变量：g + 大驼峰
   - key: readability-identifier-naming.GlobalVariableCase
     value: CamelCase
   - key: readability-identifier-naming.GlobalVariablePrefix
     value: g
+
+  # 文件作用域 / 命名空间 inline constexpr 全局常量：g + 大驼峰
   - key: readability-identifier-naming.GlobalConstantCase
     value: CamelCase
   - key: readability-identifier-naming.GlobalConstantPrefix

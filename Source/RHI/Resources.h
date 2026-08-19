@@ -73,8 +73,20 @@ namespace RHI
     {
     };
 
-    inline constexpr UInt32 UnusedAttachmentIndex{~0u};
-    inline constexpr UInt32 ExternalSubpassIndex{~0u};
+    struct DescriptorSetHandle : GPUHandle
+    {
+    };
+
+    struct CommandPoolHandle : GPUHandle
+    {
+    };
+
+    struct CommandBufferHandle : GPUHandle
+    {
+    };
+
+    inline constexpr UInt32 gUnusedAttachmentIndex{~0u};
+    inline constexpr UInt32 gExternalSubpassIndex{~0u};
 
     struct BufferDesc
     {
@@ -224,7 +236,7 @@ namespace RHI
 
     struct RenderPassAttachmentRef
     {
-        UInt32 Attachment = UnusedAttachmentIndex;
+        UInt32 Attachment = gUnusedAttachmentIndex;
         TextureLayout Layout = TextureLayout::Undefined;
     };
 
@@ -240,8 +252,8 @@ namespace RHI
 
     struct RenderPassSubpassDependencyDesc
     {
-        UInt32 SourceSubpass = ExternalSubpassIndex;
-        UInt32 DestinationSubpass = ExternalSubpassIndex;
+        UInt32 SourceSubpass = gExternalSubpassIndex;
+        UInt32 DestinationSubpass = gExternalSubpassIndex;
         PipelineStageFlag SourceStageMask = PipelineStageFlag::None;
         PipelineStageFlag DestinationStageMask = PipelineStageFlag::None;
         AccessFlag SourceAccessMask = AccessFlag::None;
@@ -258,60 +270,82 @@ namespace RHI
     struct GPUBuffer : GPUResourceWithDesc<BufferDesc>
     {
         using GPUResourceWithDesc<BufferDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
+        UIntPtr Allocation = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPUTexture : GPUResourceWithDesc<TextureDesc>
     {
         using GPUResourceWithDesc<TextureDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
+        UIntPtr Allocation = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPUTextureView : GPUResourceWithDesc<TextureViewDesc>
     {
         using GPUResourceWithDesc<TextureViewDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPUSampler : GPUResourceWithDesc<SamplerDesc>
     {
         using GPUResourceWithDesc<SamplerDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPUShader : GPUResourceWithDesc<ShaderDesc>
     {
         using GPUResourceWithDesc<ShaderDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPUDescriptorSetLayout : GPUResourceWithDesc<DescriptorSetLayoutDesc>
     {
         using GPUResourceWithDesc<DescriptorSetLayoutDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPUPipelineLayout : GPUResourceWithDesc<PipelineLayoutDesc>
     {
         using GPUResourceWithDesc<PipelineLayoutDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPUGraphicsPipeline : GPUResourceWithDesc<GraphicsPipelineDesc>
     {
         using GPUResourceWithDesc<GraphicsPipelineDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPUComputePipeline : GPUResourceWithDesc<ComputePipelineDesc>
     {
         using GPUResourceWithDesc<ComputePipelineDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
         char DebugName[64]{};
     };
 
     struct GPURenderPass : GPUResourceWithDesc<RenderPassDesc>
     {
         using GPUResourceWithDesc<RenderPassDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
         char DebugName[64]{};
     };
 

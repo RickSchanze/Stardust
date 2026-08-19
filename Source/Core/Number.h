@@ -183,8 +183,8 @@ public:
             return false;
         }
 
-        const char* Begin = Trimmed.Data();
-        const char* End = Begin + Trimmed.Size();
+        const auto* Begin = Trimmed.Data();
+        const auto* End = Begin + Trimmed.Size();
         if (*Begin == '+')
         {
             ++Begin;

@@ -20,7 +20,7 @@ public:
 #if STARDUST_ENABLE_PROFILING
         const char* File = Location.file_name();
         const char* Function = Location.function_name();
-        const std::uint32_t Line = Location.line();
+        const auto Line = Location.line();
 
         std::uint64_t Srcloc = 0;
         if (Name != nullptr && Name[0] != '\0')

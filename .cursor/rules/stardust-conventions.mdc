@@ -21,10 +21,10 @@ alwaysApply: true
 | 局部变量 / 参数 | 大驼峰 | `BufferSize` |
 | public 成员（含 static） | 大驼峰，无前缀 | `DeviceName` / `static Instance` |
 | protected / private 成员（含 static） | `m` + 大驼峰 | `mDeviceName` / `static mInstance` |
-| 文件作用域全局变量 | `g` + 大驼峰 | `gEngine` |
+| 文件作用域全局变量 / 命名空间 `inline constexpr` | `g` + 大驼峰 | `gCommandAlignment` / `gEngine` |
 | 静态成员 | **无**单独前缀，按访问属性 | private → `mInstance`；public → `Instance` |
 
-说明：clang-tidy 把静态数据成员归为 `ClassMember`（不是 `PrivateMember`）；未配置时会误判为全局变量并强行加 `g`。已在 `.clang-tidy` 用 `ClassMember` + `ClassMemberIgnoredRegexp` 放行 `m` 前缀。
+说明：clang-tidy 把静态数据成员归为 `ClassMember`（不是 `PrivateMember`）；未配置时会误判为全局变量并强行加 `g`。已在 `.clang-tidy` 用 `ClassMember` + `ClassMemberIgnoredRegexp` 放行 `m` 前缀。命名空间内 `inline constexpr` 视为 **GlobalConstant**，同样必须 `g` 前缀。
 
 
 例外：
@@ -40,11 +40,23 @@ alwaysApply: true
 - 日志 Category 参数为 `Logcat` 枚举项名（如 `Render`），枚举本身保留作分类清单；禁止再扩大其它业务宏
 - 常量 / 内联逻辑 / 类型别名仍用 `constexpr` / `using` 等，不用宏
 
-## 格式
+## 格式与静态检查（强制）
 
 - 遵循根目录 `.clang-format`（Allman 大括号、4 空格；初始化列表逗号在行尾，禁止 `, Foo` 式 Leading comma）
-- **每次写完/改完 `Source/` 下 C/C++ 文件后必须立刻 `clang-format -i --style=file`**，详见 `clang-format.mdc`；禁止只改内容不格式化
-- 命名由 `.clang-tidy` 的 `readability-identifier-naming` 约束
+- 命名由根目录 `.clang-tidy` 的 `readability-identifier-naming` 约束
+- **每次写完/改完 `Source/` 下 C/C++ 文件后必须立刻跑 clang-format 与 clang-tidy**，两者都通过才能结束本轮；详见 `clang-format-and-tidy.mdc`
+- 禁止只改内容不检查；禁止只跑 format 或只跑 tidy
+
+## C++ 惯用法（与 CLion 检查对齐）
+
+- **指定初始化（designated initializers）**：**聚合类型 / POD struct** 初始化时，多字段或嵌套成员（如 `Command`、各类 `*Command`、Desc）优先用指定初始化；带成员函数的 class（如 `CommandBuffer`）对其成员 struct 字段可用指定初始化，但 class 本身仍用默认构造 + 赋值
+  - 正确：`Command Header{.Type = TypeValue};`、`DrawCommand{.Header = {.Type = DrawCommand::TypeValue}, .VertexCount = 3};`
+  - 错误：`Command Header{TypeValue};`、`DrawCommand Command{}; Command.VertexCount = 3;`
+- **`auto`**：局部变量、以及 `static constexpr` 成员在右侧类型可明确推断时使用 `auto`（CLion `CppUseAuto`）
+  - 正确：`const auto Offset = AlignCommandOffset(...);`、`static constexpr auto TypeValue = CommandType::Draw;`
+  - 例外：需要明确接口类型、窄化风险、或 `auto` 降低可读性时保留显式类型
+- CLion 项目检查已启用：`CppUseAuto`、`CppUseDesignatedInitializers`（见 `.idea/inspectionProfiles/Project_Default.xml`）
+- **clang-tidy 例外**：`Source/` 外不检查；容器/分配器的 STL 接口名（`begin`/`end`/`value_type`/`allocate` 等）保持标准库命名，见 `.clang-tidy` 的 `*IgnoredRegexp`
 
 ## CMake / 第三方
 
