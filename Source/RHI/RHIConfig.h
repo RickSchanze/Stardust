@@ -1,3 +1,4 @@
 #pragma once
 
 #define STARDUST_RHI_VALIDATE_DESC 1
+#define STARDUST_RHI_BUILD_VULKAN 1

@@ -1,10 +1,11 @@
-//
-// Created by hulkzhou on 2026/8/19.
-//
-
 #include "Device.h"
 
 #include "Core/Debug/Debug.h"
+#include "RHIConfig.h"
+
+#if STARDUST_RHI_BUILD_VULKAN
+    #include "Vulkan/VulkanDevice.h"
+#endif
 
 using namespace RHI;
 
@@ -18,10 +19,20 @@ Device& RHI::GetDevice()
 
 bool RHI::CreateVulkanDevice()
 {
-    return true;
+#if STARDUST_RHI_BUILD_VULKAN
+    Assert(gDevice == nullptr);
+    gDevice = New<VulkanDevice>();
+    return gDevice->Init();
+#else
+    return false;
+#endif
 }
 
 void RHI::DestroyVulkanDevice()
 {
-    return;
+#if STARDUST_RHI_BUILD_VULKAN
+    Assert(gDevice != nullptr);
+    gDevice->UnInit();
+    Delete(gDevice);
+#endif
 }

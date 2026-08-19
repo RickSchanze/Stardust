@@ -57,6 +57,9 @@ namespace RHI
         virtual CommandBufferHandle CreateCommandBuffer(const CommandBufferDesc& Desc) = 0;
         virtual void DestroyCommandBuffer(const CommandBufferHandle Handle) = 0;
 
+        virtual bool Init() = 0;
+        virtual void UnInit() = 0;
+
         [[nodiscard]] GPUBuffer& GetBuffer(const BufferHandle Handle)
         {
             return mBuffers.Get(Handle);
