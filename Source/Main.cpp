@@ -19,6 +19,7 @@
 #include "Core/Profiler/Profiler.h"
 #include "Core/String/String.h"
 #include "Core/String/StringView.h"
+#include "RHI/Device.h"
 
 enum class NamedColor
 {
@@ -193,6 +194,9 @@ static int Main()
     SmokeTestColor();
     SmokeTestProfiler();
     SmokeTestNumber();
+
+    Assert(RHI::CreateVulkanDevice());
+    RHI::DestroyVulkanDevice();
 
     MarkFrame();
     return 0;

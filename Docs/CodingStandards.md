@@ -98,7 +98,7 @@ RenderDevice* gPrimaryDevice = nullptr;
 
 ## 5. 格式化与静态检查
 
-- **clang-format**：Allman 大括号、缩进 4 空格、列宽 120、指针/引用贴类型左侧（`Type*`）；构造初始化列表与继承列表逗号在行尾（`BreakConstructorInitializers/BreakInheritanceList: AfterColon`），禁止 Leading comma
+- **clang-format**：Allman 大括号、缩进 4 空格、列宽 120、指针/引用贴类型左侧（`Type*`）；构造初始化列表与继承列表逗号在行尾（`BreakConstructorInitializers/BreakInheritanceList: AfterColon`），禁止 Leading comma；预处理指令与 `#include` 不随嵌套缩进（`IndentPPDirectives: None`）
 - **clang-tidy**：`readability-identifier-naming` 按第 3 节规则检查；`HeaderFilterRegex` 仅覆盖 `Source/`。容器/分配器/STL 兼容接口（`begin`/`end`/`value_type`/`allocate`/`push_back` 等）见 `.clang-tidy` 的 `*IgnoredRegexp`，保持标准库命名。
 - **强制**：每次改完 `Source/` 下 C/C++ 文件后必须立刻跑 `clang-format` **与** `clang-tidy`（见 `.cursor/rules/clang-format-and-tidy.mdc`），两者都干净才能结束；禁止只改内容或只跑其中一个
 - CLion：启用 ClangFormat、Clang-Tidy，与仓库配置文件对齐

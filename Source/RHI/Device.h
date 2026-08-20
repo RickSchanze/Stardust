@@ -253,8 +253,6 @@ namespace RHI
         GPUResourcePool<GPURenderPass> mRenderPasses;
         GPUResourcePool<GPUCommandPool> mCommandPools;
         GPUResourcePool<GPUCommandBuffer> mCommandBuffers;
-
-    private:
         API mAPI = API::Count;
     };
 

@@ -1,10 +1,11 @@
 #include "Device.h"
 
 #include "Core/Debug/Debug.h"
+#include "Core/Memory/Memory.h"
 #include "RHIConfig.h"
 
 #if STARDUST_RHI_BUILD_VULKAN
-    #include "Vulkan/VulkanDevice.h"
+#include "Vulkan/VulkanDevice.h"
 #endif
 
 using namespace RHI;
@@ -34,5 +35,6 @@ void RHI::DestroyVulkanDevice()
     Assert(gDevice != nullptr);
     gDevice->UnInit();
     Delete(gDevice);
+    gDevice = nullptr;
 #endif
 }

@@ -1,5 +1,6 @@
 # Generated for Stardust — Unreal-like formatting baseline
 # Naming (PascalCase / m / g / s) is enforced by .clang-tidy + Cursor rules, not clang-format.
+# Preprocessor (`#if` / `#include` / `#define`) stays at column 0; do not indent with surrounding code.
 ---
 Language: Cpp
 BasedOnStyle: LLVM
@@ -60,7 +61,7 @@ IncludeCategories:
     Priority: 4
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IndentCaseLabels: true
-IndentPPDirectives: BeforeHash
+IndentPPDirectives: None
 IndentWidth: 4
 InsertNewlineAtEOF: true
 KeepEmptyLinesAtTheStartOfBlocks: false
@@ -151,7 +152,7 @@ IncludeCategories:
     Priority: 4
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IndentCaseLabels: true
-IndentPPDirectives: BeforeHash
+IndentPPDirectives: None
 IndentWidth: 4
 InsertNewlineAtEOF: true
 KeepEmptyLinesAtTheStartOfBlocks: false

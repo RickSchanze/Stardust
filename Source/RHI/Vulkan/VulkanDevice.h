@@ -1,14 +1,20 @@
 #pragma once
+
 #include "RHI/Device.h"
 #include "RHI/RHIConfig.h"
 
-#if STARDUST_RHI_VALIDATE_DESC
+#if STARDUST_RHI_BUILD_VULKAN
+
+#include "RHI/Vulkan/Vulkan.h"
 
 namespace RHI
 {
     class VulkanDevice : public Device
     {
     public:
+        bool Init() override;
+        void UnInit() override;
+
         BufferHandle CreateBuffer(const BufferDesc& Desc) override;
         void DestroyBuffer(const BufferHandle Handle) override;
 
@@ -44,6 +50,26 @@ namespace RHI
 
         CommandBufferHandle CreateCommandBuffer(const CommandBufferDesc& Desc) override;
         void DestroyCommandBuffer(const CommandBufferHandle Handle) override;
+
+    private:
+        [[nodiscard]] bool CreateInstance();
+        [[nodiscard]] bool PickPhysicalDevice();
+        [[nodiscard]] bool CreateLogicalDevice();
+        [[nodiscard]] bool CreateAllocator();
+#if STARDUST_RHI_ENABLE_VALIDATION
+        void CreateDebugMessenger();
+#endif
+
+        VkInstance mInstance = VK_NULL_HANDLE;
+        VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
+        VkDevice mDevice = VK_NULL_HANDLE;
+        VkQueue mGraphicsQueue = VK_NULL_HANDLE;
+        UInt32 mGraphicsQueueFamily = 0;
+        VmaAllocator mAllocator = nullptr;
+#if STARDUST_RHI_ENABLE_VALIDATION
+        VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
+        bool mValidationEnabled = false;
+#endif
     };
 } // namespace RHI
 

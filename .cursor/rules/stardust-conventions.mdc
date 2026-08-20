@@ -42,7 +42,7 @@ alwaysApply: true
 
 ## 格式与静态检查（强制）
 
-- 遵循根目录 `.clang-format`（Allman 大括号、4 空格；初始化列表逗号在行尾，禁止 `, Foo` 式 Leading comma）
+- 遵循根目录 `.clang-format`（Allman 大括号、4 空格；初始化列表逗号在行尾，禁止 `, Foo` 式 Leading comma；`#if` / `#include` / `#define` 不随嵌套缩进）
 - 命名由根目录 `.clang-tidy` 的 `readability-identifier-naming` 约束
 - **每次写完/改完 `Source/` 下 C/C++ 文件后必须立刻跑 clang-format 与 clang-tidy**，两者都通过才能结束本轮；详见 `clang-format-and-tidy.mdc`
 - 禁止只改内容不检查；禁止只跑 format 或只跑 tidy
