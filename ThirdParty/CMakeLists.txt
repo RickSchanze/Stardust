@@ -58,6 +58,41 @@ add_subdirectory(volk EXCLUDE_FROM_ALL)
 set(VMA_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(VulkanMemoryAllocator EXCLUDE_FROM_ALL)
 
+# ---------------------------------------------------------------------------
+# slang；禁用会触发网络下载的选项）
+# ---------------------------------------------------------------------------
+set(SLANG_ENABLE_CUDA OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_OPTIX OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_NVAPI OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_AFTERMATH OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_DX_ON_VK OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANG_RHI OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_GFX OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGD OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGC OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGI OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_REPLAYER OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_DXIL OFF CACHE BOOL "" FORCE)
+set(SLANG_EXCLUDE_DAWN ON CACHE BOOL "" FORCE)
+set(SLANG_EXCLUDE_TINT ON CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_MIMALLOC OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SPIRV_TOOLS_MIMALLOC OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SPLIT_DEBUG_INFO OFF CACHE BOOL "" FORCE)
+set(SLANG_SLANG_LLVM_FLAVOR DISABLE CACHE STRING "" FORCE)
+set(SLANG_LIB_TYPE STATIC CACHE STRING "" FORCE)
+add_subdirectory(slang EXCLUDE_FROM_ALL)
+
+# slang 在 _WIN32 下入口是 wmain；MinGW 默认找 main，需 -municode
+if (MINGW)
+    foreach (SlangExe IN ITEMS slang-bootstrap slangc)
+        if (TARGET ${SlangExe})
+            target_link_options(${SlangExe} PRIVATE -municode)
+        endif ()
+    endforeach ()
+endif ()
+
 # 统一导出给引擎目标
 add_library(StardustThirdParty INTERFACE)
 target_link_libraries(StardustThirdParty INTERFACE
@@ -68,6 +103,7 @@ target_link_libraries(StardustThirdParty INTERFACE
     Vulkan::Headers
     volk
     GPUOpen::VulkanMemoryAllocator
+    slang
 )
 target_compile_definitions(StardustThirdParty INTERFACE
     VK_NO_PROTOTYPES
