@@ -257,8 +257,8 @@ bool VulkanDevice::CreateInstance()
         std::uint32_t LayerCount = 0;
         if (vkEnumerateInstanceLayerProperties(&LayerCount, nullptr) == VK_SUCCESS)
         {
-            Array<VkLayerProperties> Layers(LayerCount);
-            if (vkEnumerateInstanceLayerProperties(&LayerCount, Layers.Data()) == VK_SUCCESS &&
+            if (Array<VkLayerProperties> Layers(LayerCount);
+                vkEnumerateInstanceLayerProperties(&LayerCount, Layers.Data()) == VK_SUCCESS &&
                 HasLayer(Layers, "VK_LAYER_KHRONOS_validation"))
             {
                 EnabledLayers.Add("VK_LAYER_KHRONOS_validation");
@@ -274,8 +274,8 @@ bool VulkanDevice::CreateInstance()
         bool DebugUtilsEnabled = false;
         if (vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, nullptr) == VK_SUCCESS)
         {
-            Array<VkExtensionProperties> Extensions(ExtensionCount);
-            if (vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, Extensions.Data()) == VK_SUCCESS &&
+            if (Array<VkExtensionProperties> Extensions(ExtensionCount);
+                vkEnumerateInstanceExtensionProperties(nullptr, &ExtensionCount, Extensions.Data()) == VK_SUCCESS &&
                 HasExtension(Extensions, VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
             {
                 EnabledExtensions.Add(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -306,7 +306,7 @@ bool VulkanDevice::CreateInstance()
     }
 #endif
 
-    const VkApplicationInfo AppInfo{
+    constexpr VkApplicationInfo AppInfo{
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
         .pNext = nullptr,
         .pApplicationName = "Stardust",
@@ -386,8 +386,7 @@ bool VulkanDevice::PickPhysicalDevice()
             continue;
         }
 
-        const auto Score = ScorePhysicalDevice(PhysicalDevice);
-        if (Score > BestScore)
+        if (const auto Score = ScorePhysicalDevice(PhysicalDevice); Score > BestScore)
         {
             BestScore = Score;
             BestDevice = PhysicalDevice;
@@ -417,7 +416,7 @@ bool VulkanDevice::PickPhysicalDevice()
 
 bool VulkanDevice::CreateLogicalDevice()
 {
-    const float QueuePriority = 1.0f;
+    constexpr float QueuePriority = 1.0f;
     const VkDeviceQueueCreateInfo QueueInfo{
         .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .pNext = nullptr,
