@@ -7,7 +7,6 @@
 
 #if STARDUST_RHI_ENABLE_VALIDATION
 #include <cstdlib>
-#include <filesystem>
 #endif
 
 #include "Core/Container/Array.h"
@@ -16,6 +15,8 @@
 #include "Core/Profiler/Profiler.h"
 
 #if STARDUST_RHI_ENABLE_VALIDATION
+#include "Core/IO/Directory.h"
+#include "Core/IO/Path.h"
 #include "Core/String/String.h"
 #endif
 
@@ -95,8 +96,8 @@ namespace
             return;
         }
 
-        const auto LayerDir = String::Format("{}\\Bin", Sdk);
-        if (!std::filesystem::is_directory(std::filesystem::path{LayerDir.Data()}))
+        const auto LayerDir = Path::Combine(Sdk, "Bin");
+        if (!Directory::Exists(LayerDir))
         {
             LogWarn(RHI, "VULKAN_SDK Bin missing: {}", LayerDir);
             return;

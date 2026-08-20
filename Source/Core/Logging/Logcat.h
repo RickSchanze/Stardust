@@ -6,5 +6,6 @@ enum class Logcat
     Engine,
     Test,
     RHI,
+    IO,
     Assert,
 };
