@@ -25,7 +25,7 @@ using namespace RHI;
 
 namespace
 {
-    void LogValidationFailure(const String& Message, const char* const DebugName)
+    void LogResourceError(const String& Message, const char* const DebugName)
     {
         if (DebugName != nullptr && DebugName[0] != '\0')
         {
@@ -34,24 +34,6 @@ namespace
         }
 
         LogError(RHI, "{}", Message);
-    }
-
-    template <typename TDesc, typename TValidate>
-    [[nodiscard]] bool FailIfInvalidDesc(const TDesc& Desc, const char* const DebugName, TValidate&& Validate)
-    {
-#if STARDUST_RHI_VALIDATE_DESC
-        String Message;
-        if (!Validate(Desc, &Message))
-        {
-            LogValidationFailure(Message, DebugName);
-            return true;
-        }
-#else
-        (void)Desc;
-        (void)DebugName;
-        (void)Validate;
-#endif
-        return false;
     }
 
     template <typename THandle>
@@ -571,10 +553,14 @@ void VulkanDevice::SetObjectDebugName(const VkObjectType ObjectType,
 
 BufferHandle VulkanDevice::CreateBuffer(const BufferDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateBufferDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateBufferDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
+#endif
 
     Assert(mAllocator != nullptr);
 
@@ -602,7 +588,7 @@ BufferHandle VulkanDevice::CreateBuffer(const BufferDesc& Desc, const char* Debu
     if (const auto Result = vmaCreateBuffer(mAllocator, &BufferInfo, &AllocationInfo, &Buffer, &Allocation, nullptr);
         Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create buffer"}, DebugName);
+        LogResourceError(String{"Failed to create buffer"}, DebugName);
         return {};
     }
 
@@ -635,10 +621,14 @@ void VulkanDevice::DestroyBuffer(const BufferHandle Handle)
 
 TextureHandle VulkanDevice::CreateTexture(const TextureDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateTextureDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateTextureDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
+#endif
 
     Assert(mAllocator != nullptr);
 
@@ -674,7 +664,7 @@ TextureHandle VulkanDevice::CreateTexture(const TextureDesc& Desc, const char* D
     if (const auto Result = vmaCreateImage(mAllocator, &ImageInfo, &AllocationInfo, &Image, &Allocation, nullptr);
         Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create texture image"}, DebugName);
+        LogResourceError(String{"Failed to create texture image"}, DebugName);
         return {};
     }
 
@@ -707,16 +697,20 @@ void VulkanDevice::DestroyTexture(const TextureHandle Handle)
 
 TextureViewHandle VulkanDevice::CreateTextureView(const TextureViewDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateTextureViewDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateTextureViewDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
 
     if (!IsTextureValid(Desc.Texture))
     {
-        LogValidationFailure(String{"TextureViewDesc.Texture handle is not valid"}, DebugName);
+        LogResourceError(String{"TextureViewDesc.Texture handle is not valid"}, DebugName);
         return {};
     }
+#endif
 
     const GPUTexture& Texture = GetTexture(Desc.Texture);
     const VkImageViewCreateInfo ViewInfo{
@@ -746,7 +740,7 @@ TextureViewHandle VulkanDevice::CreateTextureView(const TextureViewDesc& Desc, c
     VkImageView ImageView = VK_NULL_HANDLE;
     if (const auto Result = vkCreateImageView(mDevice, &ViewInfo, nullptr, &ImageView); Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create texture view"}, DebugName);
+        LogResourceError(String{"Failed to create texture view"}, DebugName);
         return {};
     }
 
@@ -776,10 +770,14 @@ void VulkanDevice::DestroyTextureView(const TextureViewHandle Handle)
 
 SamplerHandle VulkanDevice::CreateSampler(const SamplerDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateSamplerDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateSamplerDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
+#endif
 
     VkSamplerReductionModeCreateInfo ReductionInfo{
         .sType = VK_STRUCTURE_TYPE_SAMPLER_REDUCTION_MODE_CREATE_INFO,
@@ -811,7 +809,7 @@ SamplerHandle VulkanDevice::CreateSampler(const SamplerDesc& Desc, const char* D
     VkSampler Sampler = VK_NULL_HANDLE;
     if (const auto Result = vkCreateSampler(mDevice, &SamplerInfo, nullptr, &Sampler); Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create sampler"}, DebugName);
+        LogResourceError(String{"Failed to create sampler"}, DebugName);
         return {};
     }
 
@@ -841,10 +839,14 @@ void VulkanDevice::DestroySampler(const SamplerHandle Handle)
 
 ShaderHandle VulkanDevice::CreateShader(const ShaderDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateShaderDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateShaderDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
+#endif
 
     const VkShaderModuleCreateInfo ModuleInfo{
         .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
@@ -857,7 +859,7 @@ ShaderHandle VulkanDevice::CreateShader(const ShaderDesc& Desc, const char* Debu
     VkShaderModule Module = VK_NULL_HANDLE;
     if (const auto Result = vkCreateShaderModule(mDevice, &ModuleInfo, nullptr, &Module); Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create shader module"}, DebugName);
+        LogResourceError(String{"Failed to create shader module"}, DebugName);
         return {};
     }
 
@@ -888,10 +890,14 @@ void VulkanDevice::DestroyShader(const ShaderHandle Handle)
 DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(const DescriptorSetLayoutDesc& Desc,
                                                                   const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateDescriptorSetLayoutDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateDescriptorSetLayoutDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
+#endif
 
     Array<VkDescriptorSetLayoutBinding> Bindings;
     Array<VkDescriptorBindingFlags> BindingFlags;
@@ -915,14 +921,16 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(const Descript
         {
             Array<VkSampler>& Samplers = ImmutableSamplerStorage.Emplace();
             Samplers.Reserve(BindingDesc.ImmutableSamplers.Num());
-            for (const SamplerHandle SamplerHandle : BindingDesc.ImmutableSamplers)
+            for (const SamplerHandle SamplerHandleValue : BindingDesc.ImmutableSamplers)
             {
-                if (!IsSamplerValid(SamplerHandle))
+#if STARDUST_RHI_VALIDATE_DESC
+                if (!IsSamplerValid(SamplerHandleValue))
                 {
-                    LogValidationFailure(String{"Immutable sampler handle is not valid"}, DebugName);
+                    LogResourceError(String{"Immutable sampler handle is not valid"}, DebugName);
                     return {};
                 }
-                Samplers.Add(GetSampler(SamplerHandle).Native.ToPtr<VkSampler>());
+#endif
+                Samplers.Add(GetSampler(SamplerHandleValue).Native.ToPtr<VkSampler>());
             }
             Binding.pImmutableSamplers = Samplers.Data();
         }
@@ -950,7 +958,7 @@ DescriptorSetLayoutHandle VulkanDevice::CreateDescriptorSetLayout(const Descript
     VkDescriptorSetLayout Layout = VK_NULL_HANDLE;
     if (const auto Result = vkCreateDescriptorSetLayout(mDevice, &LayoutInfo, nullptr, &Layout); Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create descriptor set layout"}, DebugName);
+        LogResourceError(String{"Failed to create descriptor set layout"}, DebugName);
         return {};
     }
 
@@ -981,20 +989,26 @@ void VulkanDevice::DestroyDescriptorSetLayout(const DescriptorSetLayoutHandle Ha
 
 PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(const PipelineLayoutDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidatePipelineLayoutDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidatePipelineLayoutDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
+#endif
 
     Array<VkDescriptorSetLayout> SetLayouts;
     SetLayouts.Reserve(Desc.SetLayouts.Num());
     for (const DescriptorSetLayoutHandle LayoutHandle : Desc.SetLayouts)
     {
+#if STARDUST_RHI_VALIDATE_DESC
         if (!IsDescriptorSetLayoutValid(LayoutHandle))
         {
-            LogValidationFailure(String{"PipelineLayoutDesc.SetLayouts contains an invalid handle"}, DebugName);
+            LogResourceError(String{"PipelineLayoutDesc.SetLayouts contains an invalid handle"}, DebugName);
             return {};
         }
+#endif
         SetLayouts.Add(GetDescriptorSetLayout(LayoutHandle).Native.ToPtr<VkDescriptorSetLayout>());
     }
 
@@ -1022,7 +1036,7 @@ PipelineLayoutHandle VulkanDevice::CreatePipelineLayout(const PipelineLayoutDesc
     VkPipelineLayout Layout = VK_NULL_HANDLE;
     if (const auto Result = vkCreatePipelineLayout(mDevice, &LayoutInfo, nullptr, &Layout); Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create pipeline layout"}, DebugName);
+        LogResourceError(String{"Failed to create pipeline layout"}, DebugName);
         return {};
     }
 
@@ -1052,17 +1066,21 @@ void VulkanDevice::DestroyPipelineLayout(const PipelineLayoutHandle Handle)
 
 GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipelineDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateGraphicsPipelineDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateGraphicsPipelineDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
 
     if (!IsPipelineLayoutValid(Desc.Layout) || !IsShaderValid(Desc.VertexShader) || !IsShaderValid(Desc.FragmentShader) ||
         !IsRenderPassValid(Desc.RenderPass))
     {
-        LogValidationFailure(String{"GraphicsPipelineDesc references one or more invalid handles"}, DebugName);
+        LogResourceError(String{"GraphicsPipelineDesc references one or more invalid handles"}, DebugName);
         return {};
     }
+#endif
 
     const GPUShader& VertexShader = GetShader(Desc.VertexShader);
     const GPUShader& FragmentShader = GetShader(Desc.FragmentShader);
@@ -1224,7 +1242,7 @@ GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipeli
     if (const auto Result = vkCreateGraphicsPipelines(mDevice, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &Pipeline);
         Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create graphics pipeline"}, DebugName);
+        LogResourceError(String{"Failed to create graphics pipeline"}, DebugName);
         return {};
     }
 
@@ -1254,16 +1272,20 @@ void VulkanDevice::DestroyGraphicsPipeline(const GraphicsPipelineHandle Handle)
 
 ComputePipelineHandle VulkanDevice::CreateComputePipeline(const ComputePipelineDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateComputePipelineDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateComputePipelineDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
 
     if (!IsPipelineLayoutValid(Desc.Layout) || !IsShaderValid(Desc.ComputeShader))
     {
-        LogValidationFailure(String{"ComputePipelineDesc references one or more invalid handles"}, DebugName);
+        LogResourceError(String{"ComputePipelineDesc references one or more invalid handles"}, DebugName);
         return {};
     }
+#endif
 
     const GPUShader& ComputeShader = GetShader(Desc.ComputeShader);
     const VkComputePipelineCreateInfo PipelineInfo{
@@ -1289,7 +1311,7 @@ ComputePipelineHandle VulkanDevice::CreateComputePipeline(const ComputePipelineD
     if (const auto Result = vkCreateComputePipelines(mDevice, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &Pipeline);
         Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create compute pipeline"}, DebugName);
+        LogResourceError(String{"Failed to create compute pipeline"}, DebugName);
         return {};
     }
 
@@ -1319,10 +1341,14 @@ void VulkanDevice::DestroyComputePipeline(const ComputePipelineHandle Handle)
 
 RenderPassHandle VulkanDevice::CreateRenderPass(const RenderPassDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateRenderPassDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateRenderPassDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
+#endif
 
     Array<VkAttachmentDescription> Attachments;
     Attachments.Reserve(Desc.Attachments.Num());
@@ -1438,7 +1464,7 @@ RenderPassHandle VulkanDevice::CreateRenderPass(const RenderPassDesc& Desc, cons
     VkRenderPass RenderPass = VK_NULL_HANDLE;
     if (const auto Result = vkCreateRenderPass(mDevice, &RenderPassInfo, nullptr, &RenderPass); Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create render pass"}, DebugName);
+        LogResourceError(String{"Failed to create render pass"}, DebugName);
         return {};
     }
 
@@ -1468,10 +1494,14 @@ void VulkanDevice::DestroyRenderPass(const RenderPassHandle Handle)
 
 CommandPoolHandle VulkanDevice::CreateCommandPool(const CommandPoolDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateCommandPoolDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateCommandPoolDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
+#endif
 
     const VkCommandPoolCreateInfo PoolInfo{
         .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -1483,7 +1513,7 @@ CommandPoolHandle VulkanDevice::CreateCommandPool(const CommandPoolDesc& Desc, c
     VkCommandPool Pool = VK_NULL_HANDLE;
     if (const auto Result = vkCreateCommandPool(mDevice, &PoolInfo, nullptr, &Pool); Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to create command pool"}, DebugName);
+        LogResourceError(String{"Failed to create command pool"}, DebugName);
         return {};
     }
 
@@ -1513,16 +1543,20 @@ void VulkanDevice::DestroyCommandPool(const CommandPoolHandle Handle)
 
 CommandBufferHandle VulkanDevice::CreateCommandBuffer(const CommandBufferDesc& Desc, const char* DebugName)
 {
-    if (FailIfInvalidDesc(Desc, DebugName, ValidateCommandBufferDesc))
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateCommandBufferDesc(Desc, &Message))
     {
+        LogResourceError(Message, DebugName);
         return {};
     }
 
     if (!IsCommandPoolValid(Desc.Pool))
     {
-        LogValidationFailure(String{"CommandBufferDesc.Pool handle is not valid"}, DebugName);
+        LogResourceError(String{"CommandBufferDesc.Pool handle is not valid"}, DebugName);
         return {};
     }
+#endif
 
     const VkCommandBufferAllocateInfo AllocateInfo{
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -1535,7 +1569,7 @@ CommandBufferHandle VulkanDevice::CreateCommandBuffer(const CommandBufferDesc& D
     VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
     if (const auto Result = vkAllocateCommandBuffers(mDevice, &AllocateInfo, &CommandBuffer); Result != VK_SUCCESS)
     {
-        LogValidationFailure(String{"Failed to allocate command buffer"}, DebugName);
+        LogResourceError(String{"Failed to allocate command buffer"}, DebugName);
         return {};
     }
 
