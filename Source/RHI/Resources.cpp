@@ -1,5 +1,7 @@
 #include "Resources.h"
 
+#include "Core/Ptr.h"
+
 namespace RHI
 {
     namespace
@@ -12,12 +14,47 @@ namespace RHI
             }
         }
 
+        void CopyDebugName(char (&Destination)[64], const char* Name)
+        {
+            Destination[0] = '\0';
+            if (Name == nullptr)
+            {
+                return;
+            }
+
+            std::size_t Index = 0;
+            while (Index + 1 < 64 && Name[Index] != '\0')
+            {
+                Destination[Index] = Name[Index];
+                ++Index;
+            }
+            Destination[Index] = '\0';
+        }
+
         [[nodiscard]] bool IsAttachmentReferenceValid(const RenderPassAttachmentRef& Reference,
                                                       const UInt32 AttachmentCount)
         {
             return Reference.Attachment == gUnusedAttachmentIndex || Reference.Attachment < AttachmentCount;
         }
     } // namespace
+
+    void AssignResourceDebugName(char (&Destination)[64], const char* Name, const void* FallbackPointer)
+    {
+        if (Name != nullptr && Name[0] != '\0')
+        {
+            CopyDebugName(Destination, Name);
+            return;
+        }
+
+        if (FallbackPointer != nullptr)
+        {
+            const String Formatted = UIntPtr::FromPtr(FallbackPointer).ToString();
+            CopyDebugName(Destination, Formatted.CStr());
+            return;
+        }
+
+        Destination[0] = '\0';
+    }
 
     bool ValidateBufferDesc(const BufferDesc& Desc, String* ErrorMessage)
     {

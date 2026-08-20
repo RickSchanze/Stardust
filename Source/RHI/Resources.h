@@ -349,6 +349,8 @@ namespace RHI
         char DebugName[64]{};
     };
 
+    void AssignResourceDebugName(char (&Destination)[64], const char* Name, const void* FallbackPointer = nullptr);
+
     [[nodiscard]] bool ValidateBufferDesc(const BufferDesc& Desc, String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidateTextureDesc(const TextureDesc& Desc, String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidateTextureViewDesc(const TextureViewDesc& Desc, String* ErrorMessage = nullptr);

@@ -21,40 +21,45 @@ namespace RHI
             return mAPI;
         }
 
-        virtual BufferHandle CreateBuffer(const BufferDesc& Desc) = 0;
+        virtual BufferHandle CreateBuffer(const BufferDesc& Desc, const char* DebugName = nullptr) = 0;
         virtual void DestroyBuffer(const BufferHandle Handle) = 0;
 
-        virtual TextureHandle CreateTexture(const TextureDesc& Desc) = 0;
+        virtual TextureHandle CreateTexture(const TextureDesc& Desc, const char* DebugName = nullptr) = 0;
         virtual void DestroyTexture(const TextureHandle Handle) = 0;
 
-        virtual TextureViewHandle CreateTextureView(const TextureViewDesc& Desc) = 0;
+        virtual TextureViewHandle CreateTextureView(const TextureViewDesc& Desc, const char* DebugName = nullptr) = 0;
         virtual void DestroyTextureView(const TextureViewHandle Handle) = 0;
 
-        virtual SamplerHandle CreateSampler(const SamplerDesc& Desc) = 0;
+        virtual SamplerHandle CreateSampler(const SamplerDesc& Desc, const char* DebugName = nullptr) = 0;
         virtual void DestroySampler(const SamplerHandle Handle) = 0;
 
-        virtual ShaderHandle CreateShader(const ShaderDesc& Desc) = 0;
+        virtual ShaderHandle CreateShader(const ShaderDesc& Desc, const char* DebugName = nullptr) = 0;
         virtual void DestroyShader(const ShaderHandle Handle) = 0;
 
-        virtual DescriptorSetLayoutHandle CreateDescriptorSetLayout(const DescriptorSetLayoutDesc& Desc) = 0;
+        virtual DescriptorSetLayoutHandle CreateDescriptorSetLayout(const DescriptorSetLayoutDesc& Desc,
+                                                                   const char* DebugName = nullptr) = 0;
         virtual void DestroyDescriptorSetLayout(const DescriptorSetLayoutHandle Handle) = 0;
 
-        virtual PipelineLayoutHandle CreatePipelineLayout(const PipelineLayoutDesc& Desc) = 0;
+        virtual PipelineLayoutHandle CreatePipelineLayout(const PipelineLayoutDesc& Desc,
+                                                          const char* DebugName = nullptr) = 0;
         virtual void DestroyPipelineLayout(const PipelineLayoutHandle Handle) = 0;
 
-        virtual GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineDesc& Desc) = 0;
+        virtual GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineDesc& Desc,
+                                                              const char* DebugName = nullptr) = 0;
         virtual void DestroyGraphicsPipeline(const GraphicsPipelineHandle Handle) = 0;
 
-        virtual ComputePipelineHandle CreateComputePipeline(const ComputePipelineDesc& Desc) = 0;
+        virtual ComputePipelineHandle CreateComputePipeline(const ComputePipelineDesc& Desc,
+                                                            const char* DebugName = nullptr) = 0;
         virtual void DestroyComputePipeline(const ComputePipelineHandle Handle) = 0;
 
-        virtual RenderPassHandle CreateRenderPass(const RenderPassDesc& Desc) = 0;
+        virtual RenderPassHandle CreateRenderPass(const RenderPassDesc& Desc, const char* DebugName = nullptr) = 0;
         virtual void DestroyRenderPass(const RenderPassHandle Handle) = 0;
 
-        virtual CommandPoolHandle CreateCommandPool(const CommandPoolDesc& Desc) = 0;
+        virtual CommandPoolHandle CreateCommandPool(const CommandPoolDesc& Desc, const char* DebugName = nullptr) = 0;
         virtual void DestroyCommandPool(const CommandPoolHandle Handle) = 0;
 
-        virtual CommandBufferHandle CreateCommandBuffer(const CommandBufferDesc& Desc) = 0;
+        virtual CommandBufferHandle CreateCommandBuffer(const CommandBufferDesc& Desc,
+                                                        const char* DebugName = nullptr) = 0;
         virtual void DestroyCommandBuffer(const CommandBufferHandle Handle) = 0;
 
         virtual bool Init() = 0;
