@@ -77,7 +77,7 @@ target_link_libraries(StardustThirdParty INTERFACE slang)
 
 ```bash
 cmake --preset debug
-cmake --build Build/Debug --target Stardust -j
+cmake --build --preset debug --target Stardust -j
 ```
 
 首次编 slang + spirv-tools / glslang 会较久，属正常。

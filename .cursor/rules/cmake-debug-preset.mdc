@@ -1,0 +1,19 @@
+---
+description: 编译与验证一律使用 CMakePresets.json 的 debug 预设
+alwaysApply: true
+---
+
+# CMake Debug 预设（强制）
+
+所有 **configure / build / 编译验证** 必须使用仓库根 `CMakePresets.json` 的 **`debug` 预设**（生成目录 `Build/Debug`，GCC 16 / MSYS2 UCRT64 / Ninja）。
+
+禁止用 `release`、`relwithdebinfo`，禁止手写 `cmake -B`、换生成器、换编译器来“验证能编过”。用户未明确要求其它预设时，不要去编 `Build/Release` 或 `Build/RelWithDebugInfo`。
+
+```
+cmake --preset debug
+cmake --build --preset debug --target Stardust -j
+```
+
+- clang-tidy 的 `-p` **只许** `Build/Debug`（即 debug 预设的 `compile_commands.json`）
+- 若没有该编译数据库：先 `cmake --preset debug`，不要改用其它构建目录
+- 依赖接入、改 CMake、改 `Source/` 后的编译验证，同样只走上述两条命令

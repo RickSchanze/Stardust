@@ -26,7 +26,7 @@ Stardust 第三方**只许** `git submodule` + `ThirdParty/CMakeLists.txt` 的 `
    git submodule update --init --recursive ThirdParty/<name>
    ```
 2. 在 `ThirdParty/CMakeLists.txt`：关测试/示例等，`add_subdirectory(<name> EXCLUDE_FROM_ALL)`，再 `target_link_libraries(StardustThirdParty INTERFACE ...)`。
-3. 重新 configure / build：`cmake --preset debug` 后 `cmake --build Build/Debug`。
+3. 重新 configure / build：`cmake --preset debug` 后 `cmake --build --preset debug`。
 4. 确认 `.gitmodules` 已登记；嵌套 submodule 必须 `--recursive`。
 
 ## 检查清单

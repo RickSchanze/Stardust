@@ -30,7 +30,7 @@ clang-format -i --style=file <相对路径>
 clang-tidy -p Build/Debug --config-file=.clang-tidy <相对路径>
 ```
 
-若当前没有 `Build/Debug/compile_commands.json`，可用其它已配置的构建目录（`Build/Release`、`Build/RelWithDebugInfo`）代替 `-p` 路径。仍没有 compile_commands 时，至少用配置文件直接检查命名：
+`-p` **只许** Debug 预设产物 `Build/Debug`。若没有 `Build/Debug/compile_commands.json`，先 `cmake --preset debug` 再跑 tidy，禁止改用 Release / RelWithDebInfo。仍没有 compile_commands 时，至少用配置文件直接检查命名：
 
 ```
 clang-tidy --config-file=.clang-tidy <相对路径> -- -std=c++26

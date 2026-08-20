@@ -64,13 +64,13 @@ target_link_libraries(StardustThirdParty INTERFACE SDL3::SDL3)
 
 ```bash
 cmake --preset debug
-cmake --build Build/Debug --target Stardust -j
+cmake --build --preset debug --target Stardust -j
 ```
 
 若只想先验证 SDL 目标：
 
 ```bash
-cmake --build Build/Debug --target SDL3-static -j
+cmake --build --preset debug --target SDL3-static -j
 ```
 
 ## 4. 常见问题
