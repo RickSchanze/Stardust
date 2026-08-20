@@ -2,8 +2,9 @@
 name: SetupDependency
 description: >-
   Guides adding and configuring Stardust ThirdParty git submodule dependencies
-  (especially slang). Use when adding a third-party library, setting up slang,
-  fixing submodule init/recursive clone, or editing ThirdParty/CMakeLists.txt.
+  (especially slang and SDL3). Use when adding a third-party library, setting up
+  slang or SDL3, fixing submodule init/recursive clone, or editing
+  ThirdParty/CMakeLists.txt.
 ---
 
 # SetupDependency
@@ -12,7 +13,10 @@ Stardust 第三方**只许** `git submodule` + `ThirdParty/CMakeLists.txt` 的 `
 
 网络失败时优先试代理：`http://127.0.0.1:7890`（`HTTP_PROXY` / `HTTPS_PROXY`）。
 
-详细 slang 步骤见 [slang.md](slang.md)。
+详细步骤：
+
+- slang → [slang.md](slang.md)
+- SDL3 → [sdl3.md](sdl3.md)
 
 ## 通用流程
 

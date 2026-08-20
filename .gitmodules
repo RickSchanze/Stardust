@@ -22,3 +22,6 @@
 [submodule "ThirdParty/slang"]
 	path = ThirdParty/slang
 	url = https://github.com/RickSchanze/slang.git
+[submodule "ThirdParty/SDL"]
+	path = ThirdParty/SDL
+	url = https://github.com/RickSchanze/SDL.git

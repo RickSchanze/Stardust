@@ -11,6 +11,8 @@
 | volk | `ThirdParty/volk` | https://github.com/RickSchanze/volk.git |
 | VulkanMemoryAllocator | `ThirdParty/VulkanMemoryAllocator` | https://github.com/RickSchanze/VulkanMemoryAllocator.git |
 | Vulkan-Headers | `ThirdParty/Vulkan-Headers` | https://github.com/KhronosGroup/Vulkan-Headers.git |
+| SDL | `ThirdParty/SDL` | https://github.com/RickSchanze/SDL.git |
+| slang | `ThirdParty/slang` | https://github.com/RickSchanze/slang.git |
 
 ```bash
 git submodule update --init --recursive

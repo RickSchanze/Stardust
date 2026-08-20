@@ -59,6 +59,17 @@ set(VMA_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(VulkanMemoryAllocator EXCLUDE_FROM_ALL)
 
 # ---------------------------------------------------------------------------
+# SDL3（静态链入，关测试/示例/安装）
+# ---------------------------------------------------------------------------
+set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+set(SDL_STATIC ON CACHE BOOL "" FORCE)
+set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+set(SDL_TESTS OFF CACHE BOOL "" FORCE)
+set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SDL_INSTALL OFF CACHE BOOL "" FORCE)
+add_subdirectory(SDL EXCLUDE_FROM_ALL)
+
+# ---------------------------------------------------------------------------
 # slang；禁用会触发网络下载的选项）
 # ---------------------------------------------------------------------------
 set(SLANG_ENABLE_CUDA OFF CACHE BOOL "" FORCE)
@@ -103,6 +114,7 @@ target_link_libraries(StardustThirdParty INTERFACE
     Vulkan::Headers
     volk
     GPUOpen::VulkanMemoryAllocator
+    SDL3::SDL3
     slang
 )
 target_compile_definitions(StardustThirdParty INTERFACE
