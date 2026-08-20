@@ -62,6 +62,12 @@ namespace RHI
                                                         const char* DebugName = nullptr) = 0;
         virtual void DestroyCommandBuffer(const CommandBufferHandle Handle) = 0;
 
+        virtual SurfaceHandle CreateSurface(const SurfaceDesc& Desc, const char* DebugName = nullptr) = 0;
+        virtual void DestroySurface(const SurfaceHandle Handle) = 0;
+
+        virtual SwapchainHandle CreateSwapchain(const SwapchainDesc& Desc, const char* DebugName = nullptr) = 0;
+        virtual void DestroySwapchain(const SwapchainHandle Handle) = 0;
+
         virtual bool Init() = 0;
         virtual void UnInit() = 0;
 
@@ -245,6 +251,36 @@ namespace RHI
             return mCommandBuffers.IsValid(Handle);
         }
 
+        [[nodiscard]] GPUSurface& GetSurface(const SurfaceHandle Handle)
+        {
+            return mSurfaces.Get(Handle);
+        }
+
+        [[nodiscard]] const GPUSurface& GetSurface(const SurfaceHandle Handle) const
+        {
+            return mSurfaces.Get(Handle);
+        }
+
+        [[nodiscard]] GPUSwapchain& GetSwapchain(const SwapchainHandle Handle)
+        {
+            return mSwapchains.Get(Handle);
+        }
+
+        [[nodiscard]] const GPUSwapchain& GetSwapchain(const SwapchainHandle Handle) const
+        {
+            return mSwapchains.Get(Handle);
+        }
+
+        [[nodiscard]] bool IsSurfaceValid(const SurfaceHandle Handle) const noexcept
+        {
+            return mSurfaces.IsValid(Handle);
+        }
+
+        [[nodiscard]] bool IsSwapchainValid(const SwapchainHandle Handle) const noexcept
+        {
+            return mSwapchains.IsValid(Handle);
+        }
+
     protected:
         GPUResourcePool<GPUBuffer> mBuffers;
         GPUResourcePool<GPUTexture> mTextures;
@@ -258,6 +294,8 @@ namespace RHI
         GPUResourcePool<GPURenderPass> mRenderPasses;
         GPUResourcePool<GPUCommandPool> mCommandPools;
         GPUResourcePool<GPUCommandBuffer> mCommandBuffers;
+        GPUResourcePool<GPUSurface> mSurfaces;
+        GPUResourcePool<GPUSwapchain> mSwapchains;
         API mAPI = API::Count;
     };
 

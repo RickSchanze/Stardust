@@ -472,6 +472,42 @@ namespace RHI
 
         return true;
     }
+
+    bool ValidateSurfaceDesc(const SurfaceDesc& Desc, String* ErrorMessage)
+    {
+        if (Desc.NativeWindow == nullptr)
+        {
+            if (Desc.Width == 0 || Desc.Height == 0)
+            {
+                SetValidationError(ErrorMessage, "SurfaceDesc dimensions must be greater than zero when creating a window.");
+                return false;
+            }
+            if (Desc.Title[0] == '\0')
+            {
+                SetValidationError(ErrorMessage, "SurfaceDesc.Title must be non-empty when creating a window.");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool ValidateSwapchainDesc(const SwapchainDesc& Desc, String* ErrorMessage)
+    {
+        if (Desc.Surface.IsNull())
+        {
+            SetValidationError(ErrorMessage, "SwapchainDesc.Surface must reference a valid surface handle.");
+            return false;
+        }
+
+        if (Desc.ImageUsage == TextureUsageFlag::None)
+        {
+            SetValidationError(ErrorMessage, "SwapchainDesc.ImageUsage must declare at least one usage flag.");
+            return false;
+        }
+
+        return true;
+    }
 } // namespace RHI
 
 template class RHI::GPUResourcePool<RHI::GPUBuffer>;
@@ -484,3 +520,5 @@ template class RHI::GPUResourcePool<RHI::GPUPipelineLayout>;
 template class RHI::GPUResourcePool<RHI::GPUGraphicsPipeline>;
 template class RHI::GPUResourcePool<RHI::GPUComputePipeline>;
 template class RHI::GPUResourcePool<RHI::GPURenderPass>;
+template class RHI::GPUResourcePool<RHI::GPUSurface>;
+template class RHI::GPUResourcePool<RHI::GPUSwapchain>;

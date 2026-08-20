@@ -2,13 +2,18 @@
 
 #if STARDUST_RHI_BUILD_VULKAN
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <iterator>
+#include <limits>
 
 #if STARDUST_RHI_ENABLE_VALIDATION
 #include <cstdlib>
 #endif
+
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 
 #include "Core/Container/Array.h"
 #include "Core/Debug/Debug.h"
@@ -53,6 +58,18 @@ namespace
         };
     }
 
+    [[nodiscard]] bool HasExtension(const Array<VkExtensionProperties>& Extensions, const char* const Name)
+    {
+        for (const VkExtensionProperties& Extension : Extensions)
+        {
+            if (std::strcmp(Extension.extensionName, Name) == 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     [[nodiscard]] std::uint32_t ScorePhysicalDevice(const VkPhysicalDevice PhysicalDevice)
     {
         VkPhysicalDeviceProperties Properties{};
@@ -92,24 +109,87 @@ namespace
         return false;
     }
 
+    [[nodiscard]] bool DeviceHasExtension(const VkPhysicalDevice PhysicalDevice, const char* const Name)
+    {
+        std::uint32_t Count = 0;
+        if (vkEnumerateDeviceExtensionProperties(PhysicalDevice, nullptr, &Count, nullptr) != VK_SUCCESS)
+        {
+            return false;
+        }
+
+        Array<VkExtensionProperties> Extensions(Count);
+        if (vkEnumerateDeviceExtensionProperties(PhysicalDevice, nullptr, &Count, Extensions.Data()) != VK_SUCCESS)
+        {
+            return false;
+        }
+        return HasExtension(Extensions, Name);
+    }
+
+    [[nodiscard]] VkSurfaceFormatKHR ChooseSwapchainFormat(const Array<VkSurfaceFormatKHR>& Formats,
+                                                           const PixelFormat Preferred)
+    {
+        if (Preferred != PixelFormat::Undefined)
+        {
+            for (const VkSurfaceFormatKHR& Format : Formats)
+            {
+                if (Format.format == static_cast<VkFormat>(Preferred))
+                {
+                    return Format;
+                }
+            }
+        }
+
+        for (const VkSurfaceFormatKHR& Format : Formats)
+        {
+            if (Format.format == VK_FORMAT_B8G8R8A8_SRGB &&
+                Format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+            {
+                return Format;
+            }
+        }
+
+        return Formats[0];
+    }
+
+    [[nodiscard]] VkPresentModeKHR ChoosePresentMode(const Array<VkPresentModeKHR>& Modes, const PresentMode Preferred)
+    {
+        const auto PreferredMode = static_cast<VkPresentModeKHR>(Preferred);
+        for (const VkPresentModeKHR Mode : Modes)
+        {
+            if (Mode == PreferredMode)
+            {
+                return Mode;
+            }
+        }
+        return VK_PRESENT_MODE_FIFO_KHR;
+    }
+
+    [[nodiscard]] VkExtent2D ChooseSwapchainExtent(const VkSurfaceCapabilitiesKHR& Capabilities,
+                                                   const UInt32 RequestedWidth,
+                                                   const UInt32 RequestedHeight)
+    {
+        if (Capabilities.currentExtent.width != std::numeric_limits<std::uint32_t>::max())
+        {
+            return Capabilities.currentExtent;
+        }
+
+        VkExtent2D Extent{
+            .width = RequestedWidth,
+            .height = RequestedHeight,
+        };
+        Extent.width = std::max(Capabilities.minImageExtent.width,
+                                std::min(Capabilities.maxImageExtent.width, Extent.width));
+        Extent.height = std::max(Capabilities.minImageExtent.height,
+                                 std::min(Capabilities.maxImageExtent.height, Extent.height));
+        return Extent;
+    }
+
 #if STARDUST_RHI_ENABLE_VALIDATION
     [[nodiscard]] bool HasLayer(const Array<VkLayerProperties>& Layers, const char* const Name)
     {
         for (const VkLayerProperties& Layer : Layers)
         {
             if (std::strcmp(Layer.layerName, Name) == 0)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    [[nodiscard]] bool HasExtension(const Array<VkExtensionProperties>& Extensions, const char* const Name)
-    {
-        for (const VkExtensionProperties& Extension : Extensions)
-        {
-            if (std::strcmp(Extension.extensionName, Name) == 0)
             {
                 return true;
             }
@@ -194,6 +274,12 @@ bool VulkanDevice::Init()
         return false;
     }
 
+    if (!EnsureSdlVideo())
+    {
+        UnInit();
+        return false;
+    }
+
     if (!CreateInstance())
     {
         UnInit();
@@ -225,6 +311,8 @@ void VulkanDevice::UnInit()
 {
     PerformanceCounter UnInitCounter{"VulkanDevice::UnInit"};
 
+    Assert(mSwapchains.LiveCount() == 0);
+    Assert(mSurfaces.LiveCount() == 0);
     Assert(mCommandBuffers.LiveCount() == 0);
     Assert(mCommandPools.LiveCount() == 0);
     Assert(mGraphicsPipelines.LiveCount() == 0);
@@ -269,6 +357,29 @@ void VulkanDevice::UnInit()
 
     mPhysicalDevice = VK_NULL_HANDLE;
     mGraphicsQueueFamily = 0;
+
+    if (mSdlVideoOwned)
+    {
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        mSdlVideoOwned = false;
+    }
+}
+
+bool VulkanDevice::EnsureSdlVideo()
+{
+    if (SDL_WasInit(SDL_INIT_VIDEO) != 0)
+    {
+        return true;
+    }
+
+    if (!SDL_InitSubSystem(SDL_INIT_VIDEO))
+    {
+        LogCritical(RHI, "Failed to init SDL video: {}", SDL_GetError());
+        return false;
+    }
+
+    mSdlVideoOwned = true;
+    return true;
 }
 
 bool VulkanDevice::CreateInstance()
@@ -284,6 +395,18 @@ bool VulkanDevice::CreateInstance()
     Array<const char*> EnabledLayers;
     Array<const char*> EnabledExtensions;
     const void* InstancePNext = nullptr;
+
+    std::uint32_t SdlExtensionCount = 0;
+    const char* const* SdlExtensions = SDL_Vulkan_GetInstanceExtensions(&SdlExtensionCount);
+    if (SdlExtensions == nullptr || SdlExtensionCount == 0)
+    {
+        LogCritical(RHI, "SDL_Vulkan_GetInstanceExtensions failed: {}", SDL_GetError());
+        return false;
+    }
+    for (std::uint32_t Index = 0; Index < SdlExtensionCount; ++Index)
+    {
+        EnabledExtensions.Add(SdlExtensions[Index]);
+    }
 
 #if STARDUST_RHI_ENABLE_VALIDATION
     mValidationEnabled = false;
@@ -423,8 +546,18 @@ bool VulkanDevice::PickPhysicalDevice()
     std::uint32_t BestFamily = 0;
     for (const auto PhysicalDevice : Devices)
     {
+        if (!DeviceHasExtension(PhysicalDevice, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
+        {
+            continue;
+        }
+
         std::uint32_t QueueFamily = 0;
         if (!FindGraphicsQueueFamily(PhysicalDevice, QueueFamily))
+        {
+            continue;
+        }
+
+        if (!SDL_Vulkan_GetPresentationSupport(mInstance, PhysicalDevice, QueueFamily))
         {
             continue;
         }
@@ -439,7 +572,7 @@ bool VulkanDevice::PickPhysicalDevice()
 
     if (BestDevice == VK_NULL_HANDLE)
     {
-        LogCritical(RHI, "No suitable Vulkan 1.3 GPU with a graphics queue");
+        LogCritical(RHI, "No suitable Vulkan 1.3 GPU with graphics+present queue");
         return false;
     }
 
@@ -478,6 +611,7 @@ bool VulkanDevice::CreateLogicalDevice()
     };
     vkGetPhysicalDeviceFeatures2(mPhysicalDevice, &Features2);
 
+    const char* DeviceExtensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
     const VkDeviceCreateInfo CreateInfo{
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .pNext = &Features2,
@@ -486,8 +620,8 @@ bool VulkanDevice::CreateLogicalDevice()
         .pQueueCreateInfos = &QueueInfo,
         .enabledLayerCount = 0,
         .ppEnabledLayerNames = nullptr,
-        .enabledExtensionCount = 0,
-        .ppEnabledExtensionNames = nullptr,
+        .enabledExtensionCount = 1,
+        .ppEnabledExtensionNames = DeviceExtensions,
         .pEnabledFeatures = nullptr,
     };
 
@@ -686,7 +820,7 @@ void VulkanDevice::DestroyTexture(const TextureHandle Handle)
     Assert(IsTextureValid(Handle));
 
     const GPUTexture& Texture = GetTexture(Handle);
-    if (Texture.Native.IsValid())
+    if (Texture.Native.IsValid() && Texture.Allocation.IsValid())
     {
         Assert(mAllocator != nullptr);
         vmaDestroyImage(mAllocator, Texture.Native.ToPtr<VkImage>(), Texture.Allocation.ToPtr<VmaAllocation>());
@@ -1599,6 +1733,332 @@ void VulkanDevice::DestroyCommandBuffer(const CommandBufferHandle Handle)
     }
 
     mCommandBuffers.Destroy(Handle);
+}
+
+SurfaceHandle VulkanDevice::CreateSurface(const SurfaceDesc& Desc, const char* DebugName)
+{
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateSurfaceDesc(Desc, &Message))
+    {
+        LogResourceError(Message, DebugName);
+        return {};
+    }
+#endif
+
+    Assert(mInstance != VK_NULL_HANDLE);
+    if (!EnsureSdlVideo())
+    {
+        return {};
+    }
+
+    SDL_Window* Window = static_cast<SDL_Window*>(Desc.NativeWindow);
+    bool OwnsNativeWindow = Desc.OwnsNativeWindow;
+    if (Window == nullptr)
+    {
+        SDL_WindowFlags Flags = SDL_WINDOW_VULKAN;
+        if (Desc.Resizable)
+        {
+            Flags |= SDL_WINDOW_RESIZABLE;
+        }
+
+        Window = SDL_CreateWindow(Desc.Title, static_cast<int>(Desc.Width), static_cast<int>(Desc.Height), Flags);
+        if (Window == nullptr)
+        {
+            LogResourceError(String::Format("Failed to create SDL window: {}", SDL_GetError()), DebugName);
+            return {};
+        }
+        OwnsNativeWindow = true;
+    }
+
+    VkSurfaceKHR Surface = VK_NULL_HANDLE;
+    if (!SDL_Vulkan_CreateSurface(Window, mInstance, nullptr, &Surface) || Surface == VK_NULL_HANDLE)
+    {
+        LogResourceError(String::Format("Failed to create Vulkan surface: {}", SDL_GetError()), DebugName);
+        if (OwnsNativeWindow)
+        {
+            SDL_DestroyWindow(Window);
+        }
+        return {};
+    }
+
+    VkBool32 PresentSupported = VK_FALSE;
+    if (vkGetPhysicalDeviceSurfaceSupportKHR(
+            mPhysicalDevice, mGraphicsQueueFamily, Surface, &PresentSupported) != VK_SUCCESS ||
+        PresentSupported != VK_TRUE)
+    {
+        LogResourceError(String{"Selected graphics queue does not support presentation to this surface"}, DebugName);
+        SDL_Vulkan_DestroySurface(mInstance, Surface, nullptr);
+        if (OwnsNativeWindow)
+        {
+            SDL_DestroyWindow(Window);
+        }
+        return {};
+    }
+
+    GPUSurface Resource(Desc);
+    Resource.Native = UIntPtr::FromPtr(Surface);
+    Resource.NativeWindow = UIntPtr::FromPtr(Window);
+    Resource.OwnsNativeWindow = OwnsNativeWindow;
+    AssignResourceDebugName(Resource.DebugName, DebugName, Surface);
+    if (Resource.DebugName[0] != '\0')
+    {
+        SetObjectDebugName(VK_OBJECT_TYPE_SURFACE_KHR, reinterpret_cast<std::uint64_t>(Surface), Resource.DebugName);
+    }
+
+    return ToTypedHandle<SurfaceHandle>(mSurfaces.Create(std::move(Resource)));
+}
+
+void VulkanDevice::DestroySurface(const SurfaceHandle Handle)
+{
+    Assert(IsSurfaceValid(Handle));
+
+    const GPUSurface& Surface = GetSurface(Handle);
+    if (Surface.Native.IsValid())
+    {
+        SDL_Vulkan_DestroySurface(mInstance, Surface.Native.ToPtr<VkSurfaceKHR>(), nullptr);
+    }
+    if (Surface.OwnsNativeWindow && Surface.NativeWindow.IsValid())
+    {
+        SDL_DestroyWindow(Surface.NativeWindow.ToPtr<SDL_Window*>());
+    }
+
+    mSurfaces.Destroy(Handle);
+}
+
+SwapchainHandle VulkanDevice::CreateSwapchain(const SwapchainDesc& Desc, const char* DebugName)
+{
+#if STARDUST_RHI_VALIDATE_DESC
+    String Message;
+    if (!ValidateSwapchainDesc(Desc, &Message))
+    {
+        LogResourceError(Message, DebugName);
+        return {};
+    }
+
+    if (!IsSurfaceValid(Desc.Surface))
+    {
+        LogResourceError(String{"SwapchainDesc.Surface handle is not valid"}, DebugName);
+        return {};
+    }
+#endif
+
+    Assert(mDevice != VK_NULL_HANDLE);
+    const GPUSurface& SurfaceResource = GetSurface(Desc.Surface);
+    const VkSurfaceKHR Surface = SurfaceResource.Native.ToPtr<VkSurfaceKHR>();
+
+    VkSurfaceCapabilitiesKHR Capabilities{};
+    if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mPhysicalDevice, Surface, &Capabilities) != VK_SUCCESS)
+    {
+        LogResourceError(String{"Failed to query surface capabilities"}, DebugName);
+        return {};
+    }
+
+    std::uint32_t FormatCount = 0;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(mPhysicalDevice, Surface, &FormatCount, nullptr);
+    if (FormatCount == 0)
+    {
+        LogResourceError(String{"No surface formats available"}, DebugName);
+        return {};
+    }
+    Array<VkSurfaceFormatKHR> Formats(FormatCount);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(mPhysicalDevice, Surface, &FormatCount, Formats.Data());
+
+    std::uint32_t PresentModeCount = 0;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(mPhysicalDevice, Surface, &PresentModeCount, nullptr);
+    if (PresentModeCount == 0)
+    {
+        LogResourceError(String{"No present modes available"}, DebugName);
+        return {};
+    }
+    Array<VkPresentModeKHR> PresentModes(PresentModeCount);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(mPhysicalDevice, Surface, &PresentModeCount, PresentModes.Data());
+
+    UInt32 RequestedWidth = Desc.Width;
+    UInt32 RequestedHeight = Desc.Height;
+    if (RequestedWidth == 0 || RequestedHeight == 0)
+    {
+        int DrawableWidth = 0;
+        int DrawableHeight = 0;
+        if (SurfaceResource.NativeWindow.IsValid())
+        {
+            SDL_GetWindowSizeInPixels(
+                SurfaceResource.NativeWindow.ToPtr<SDL_Window*>(), &DrawableWidth, &DrawableHeight);
+        }
+        if (RequestedWidth == 0)
+        {
+            RequestedWidth = DrawableWidth > 0 ? static_cast<UInt32>(DrawableWidth)
+                                               : static_cast<UInt32>(Capabilities.currentExtent.width);
+        }
+        if (RequestedHeight == 0)
+        {
+            RequestedHeight = DrawableHeight > 0 ? static_cast<UInt32>(DrawableHeight)
+                                                 : static_cast<UInt32>(Capabilities.currentExtent.height);
+        }
+    }
+
+    const VkSurfaceFormatKHR SurfaceFormat = ChooseSwapchainFormat(Formats, Desc.Format);
+    const VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes, Desc.PresentMode);
+    const VkExtent2D Extent = ChooseSwapchainExtent(Capabilities, RequestedWidth, RequestedHeight);
+    if (Extent.width == 0 || Extent.height == 0)
+    {
+        LogResourceError(String{"Swapchain extent is zero (window minimized?)"}, DebugName);
+        return {};
+    }
+
+    std::uint32_t ImageCount = Desc.PreferredImageCount;
+    if (ImageCount == 0)
+    {
+        ImageCount = Capabilities.minImageCount + 1;
+    }
+    ImageCount = std::max(ImageCount, Capabilities.minImageCount);
+    if (Capabilities.maxImageCount > 0)
+    {
+        ImageCount = std::min(ImageCount, Capabilities.maxImageCount);
+    }
+
+    const VkSwapchainCreateInfoKHR CreateInfo{
+        .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+        .pNext = nullptr,
+        .flags = 0,
+        .surface = Surface,
+        .minImageCount = ImageCount,
+        .imageFormat = SurfaceFormat.format,
+        .imageColorSpace = SurfaceFormat.colorSpace,
+        .imageExtent = Extent,
+        .imageArrayLayers = 1,
+        .imageUsage = static_cast<VkImageUsageFlags>(Desc.ImageUsage),
+        .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        .queueFamilyIndexCount = 0,
+        .pQueueFamilyIndices = nullptr,
+        .preTransform = Capabilities.currentTransform,
+        .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+        .presentMode = PresentMode,
+        .clipped = VK_TRUE,
+        .oldSwapchain = VK_NULL_HANDLE,
+    };
+
+    VkSwapchainKHR Swapchain = VK_NULL_HANDLE;
+    if (const auto Result = vkCreateSwapchainKHR(mDevice, &CreateInfo, nullptr, &Swapchain); Result != VK_SUCCESS)
+    {
+        LogResourceError(String{"Failed to create swapchain"}, DebugName);
+        return {};
+    }
+
+    std::uint32_t SwapchainImageCount = 0;
+    vkGetSwapchainImagesKHR(mDevice, Swapchain, &SwapchainImageCount, nullptr);
+    Array<VkImage> SwapchainImages(SwapchainImageCount);
+    vkGetSwapchainImagesKHR(mDevice, Swapchain, &SwapchainImageCount, SwapchainImages.Data());
+
+    GPUSwapchain Resource(Desc);
+    Resource.Native = UIntPtr::FromPtr(Swapchain);
+    Resource.Format = static_cast<PixelFormat>(SurfaceFormat.format);
+    Resource.Width = Extent.width;
+    Resource.Height = Extent.height;
+    Resource.Images.Reserve(SwapchainImageCount);
+    Resource.Views.Reserve(SwapchainImageCount);
+    AssignResourceDebugName(Resource.DebugName, DebugName, Swapchain);
+    if (Resource.DebugName[0] != '\0')
+    {
+        SetObjectDebugName(
+            VK_OBJECT_TYPE_SWAPCHAIN_KHR, reinterpret_cast<std::uint64_t>(Swapchain), Resource.DebugName);
+    }
+
+    for (std::uint32_t Index = 0; Index < SwapchainImageCount; ++Index)
+    {
+        TextureDesc ImageDesc{};
+        ImageDesc.Dimension = TextureDimension::Dim2D;
+        ImageDesc.Format = Resource.Format;
+        ImageDesc.Width = Resource.Width;
+        ImageDesc.Height = Resource.Height;
+        ImageDesc.Depth = 1;
+        ImageDesc.MipLevels = 1;
+        ImageDesc.ArrayLayers = 1;
+        ImageDesc.Samples = SampleCount::Count1;
+        ImageDesc.Usage = Desc.ImageUsage;
+        ImageDesc.Tiling = TextureTiling::Optimal;
+        ImageDesc.InitialLayout = TextureLayout::Undefined;
+
+        GPUTexture ImageResource(ImageDesc);
+        ImageResource.Native = UIntPtr::FromPtr(SwapchainImages[Index]);
+        ImageResource.Allocation = UIntPtr::Null();
+        const String ImageName = String::Format("{}[{}]", Resource.DebugName, Index);
+        char ImageDebugName[64]{};
+        AssignResourceDebugName(ImageDebugName, ImageName.CStr(), SwapchainImages[Index]);
+        AssignResourceDebugName(ImageResource.DebugName, ImageDebugName, nullptr);
+        if (ImageResource.DebugName[0] != '\0')
+        {
+            SetObjectDebugName(VK_OBJECT_TYPE_IMAGE,
+                               reinterpret_cast<std::uint64_t>(SwapchainImages[Index]),
+                               ImageResource.DebugName);
+        }
+
+        const TextureHandle ImageHandle = ToTypedHandle<TextureHandle>(mTextures.Create(std::move(ImageResource)));
+
+        TextureViewDesc ViewDesc{};
+        ViewDesc.Texture = ImageHandle;
+        ViewDesc.Dimension = TextureViewDimension::Dim2D;
+        ViewDesc.Format = Resource.Format;
+        ViewDesc.Aspect = TextureAspectFlag::Color;
+        ViewDesc.BaseMipLevel = 0;
+        ViewDesc.MipLevelCount = 1;
+        ViewDesc.BaseArrayLayer = 0;
+        ViewDesc.ArrayLayerCount = 1;
+
+        const TextureViewHandle ViewHandle =
+            CreateTextureView(ViewDesc, ImageDebugName[0] != '\0' ? ImageDebugName : nullptr);
+        if (ViewHandle.IsNull())
+        {
+            DestroyTexture(ImageHandle);
+            for (const TextureViewHandle ExistingView : Resource.Views)
+            {
+                DestroyTextureView(ExistingView);
+            }
+            for (const TextureHandle ExistingImage : Resource.Images)
+            {
+                DestroyTexture(ExistingImage);
+            }
+            vkDestroySwapchainKHR(mDevice, Swapchain, nullptr);
+            LogResourceError(String{"Failed to create swapchain image view"}, DebugName);
+            return {};
+        }
+
+        Resource.Images.Add(ImageHandle);
+        Resource.Views.Add(ViewHandle);
+    }
+
+    return ToTypedHandle<SwapchainHandle>(mSwapchains.Create(std::move(Resource)));
+}
+
+void VulkanDevice::DestroySwapchain(const SwapchainHandle Handle)
+{
+    Assert(IsSwapchainValid(Handle));
+
+    GPUSwapchain& Swapchain = GetSwapchain(Handle);
+    for (const TextureViewHandle View : Swapchain.Views)
+    {
+        if (IsTextureViewValid(View))
+        {
+            DestroyTextureView(View);
+        }
+    }
+    Swapchain.Views.Clear();
+
+    for (const TextureHandle Image : Swapchain.Images)
+    {
+        if (IsTextureValid(Image))
+        {
+            DestroyTexture(Image);
+        }
+    }
+    Swapchain.Images.Clear();
+
+    if (Swapchain.Native.IsValid())
+    {
+        vkDestroySwapchainKHR(mDevice, Swapchain.Native.ToPtr<VkSwapchainKHR>(), nullptr);
+    }
+
+    mSwapchains.Destroy(Handle);
 }
 
 #endif

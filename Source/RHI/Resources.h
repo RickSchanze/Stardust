@@ -85,6 +85,14 @@ namespace RHI
     {
     };
 
+    struct SurfaceHandle : GPUHandle
+    {
+    };
+
+    struct SwapchainHandle : GPUHandle
+    {
+    };
+
     inline constexpr UInt32 gUnusedAttachmentIndex{~0u};
     inline constexpr UInt32 gExternalSubpassIndex{~0u};
 
@@ -267,6 +275,28 @@ namespace RHI
         Array<RenderPassSubpassDependencyDesc> Dependencies;
     };
 
+    // NativeWindow 为空时默认创建 SDL 窗口（SDL_WINDOW_VULKAN）
+    struct SurfaceDesc
+    {
+        void* NativeWindow = nullptr;
+        bool OwnsNativeWindow = true;
+        char Title[128] = "Stardust";
+        UInt32 Width = 1280;
+        UInt32 Height = 720;
+        bool Resizable = true;
+    };
+
+    struct SwapchainDesc
+    {
+        SurfaceHandle Surface;
+        PresentMode PresentMode = PresentMode::Fifo;
+        PixelFormat Format = PixelFormat::Undefined;
+        UInt32 Width = 0;
+        UInt32 Height = 0;
+        UInt32 PreferredImageCount = 0;
+        TextureUsageFlag ImageUsage = TextureUsageFlag::ColorAttachment;
+    };
+
     struct GPUBuffer : GPUResourceWithDesc<BufferDesc>
     {
         using GPUResourceWithDesc<BufferDesc>::GPUResourceWithDesc;
@@ -349,6 +379,29 @@ namespace RHI
         char DebugName[64]{};
     };
 
+    struct GPUSurface : GPUResourceWithDesc<SurfaceDesc>
+    {
+        using GPUResourceWithDesc<SurfaceDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
+        UIntPtr NativeWindow = UIntPtr::Null();
+        bool OwnsNativeWindow = false;
+        char DebugName[64]{};
+    };
+
+    struct GPUSwapchain : GPUResourceWithDesc<SwapchainDesc>
+    {
+        using GPUResourceWithDesc<SwapchainDesc>::GPUResourceWithDesc;
+
+        UIntPtr Native = UIntPtr::Null();
+        PixelFormat Format = PixelFormat::Undefined;
+        UInt32 Width = 0;
+        UInt32 Height = 0;
+        Array<TextureHandle> Images;
+        Array<TextureViewHandle> Views;
+        char DebugName[64]{};
+    };
+
     void AssignResourceDebugName(char (&Destination)[64], const char* Name, const void* FallbackPointer = nullptr);
 
     [[nodiscard]] bool ValidateBufferDesc(const BufferDesc& Desc, String* ErrorMessage = nullptr);
@@ -362,5 +415,7 @@ namespace RHI
     [[nodiscard]] bool ValidateRenderPassDesc(const RenderPassDesc& Desc, String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& Desc, String* ErrorMessage = nullptr);
     [[nodiscard]] bool ValidateComputePipelineDesc(const ComputePipelineDesc& Desc, String* ErrorMessage = nullptr);
+    [[nodiscard]] bool ValidateSurfaceDesc(const SurfaceDesc& Desc, String* ErrorMessage = nullptr);
+    [[nodiscard]] bool ValidateSwapchainDesc(const SwapchainDesc& Desc, String* ErrorMessage = nullptr);
 
 } // namespace RHI

@@ -56,9 +56,16 @@ namespace RHI
                                                 const char* DebugName = nullptr) override;
         void DestroyCommandBuffer(const CommandBufferHandle Handle) override;
 
+        SurfaceHandle CreateSurface(const SurfaceDesc& Desc, const char* DebugName = nullptr) override;
+        void DestroySurface(const SurfaceHandle Handle) override;
+
+        SwapchainHandle CreateSwapchain(const SwapchainDesc& Desc, const char* DebugName = nullptr) override;
+        void DestroySwapchain(const SwapchainHandle Handle) override;
+
     private:
         void SetObjectDebugName(VkObjectType ObjectType, std::uint64_t ObjectHandle, const char* Name) const;
 
+        [[nodiscard]] bool EnsureSdlVideo();
         [[nodiscard]] bool CreateInstance();
         [[nodiscard]] bool PickPhysicalDevice();
         [[nodiscard]] bool CreateLogicalDevice();
@@ -73,6 +80,7 @@ namespace RHI
         VkQueue mGraphicsQueue = VK_NULL_HANDLE;
         UInt32 mGraphicsQueueFamily = 0;
         VmaAllocator mAllocator = nullptr;
+        bool mSdlVideoOwned = false;
 #if STARDUST_RHI_ENABLE_VALIDATION
         VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
         bool mValidationEnabled = false;
