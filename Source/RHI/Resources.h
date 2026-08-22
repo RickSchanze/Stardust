@@ -275,14 +275,20 @@ namespace RHI
         Array<RenderPassSubpassDependencyDesc> Dependencies;
     };
 
+    constexpr auto gDefaultSurfaceFormat = PixelFormat::BGRA8Srgb;
+    constexpr auto gDefaultSurfaceColorSpace = ColorSpace::SrgbNonlinear;
+    constexpr auto gDefaultSwapchainImageCount = 2;
+    constexpr auto gDefaultSurfaceWindowHeight = 1080;
+    constexpr auto gDefaultSurfaceWindowWidth = 1920;
+
     // NativeWindow 为空时默认创建 SDL 窗口（SDL_WINDOW_VULKAN）
     struct SurfaceDesc
     {
         void* NativeWindow = nullptr;
         bool OwnsNativeWindow = true;
         char Title[128] = "Stardust";
-        UInt32 Width = 1280;
-        UInt32 Height = 720;
+        UInt32 Width = gDefaultSurfaceWindowWidth;
+        UInt32 Height = gDefaultSurfaceWindowHeight;
         bool Resizable = true;
     };
 
@@ -290,10 +296,11 @@ namespace RHI
     {
         SurfaceHandle Surface;
         PresentMode PresentMode = PresentMode::Fifo;
-        PixelFormat Format = PixelFormat::Undefined;
+        PixelFormat Format = gDefaultSurfaceFormat;
+        ColorSpace ColorSpace = gDefaultSurfaceColorSpace;
         UInt32 Width = 0;
         UInt32 Height = 0;
-        UInt32 PreferredImageCount = 0;
+        UInt32 PreferredImageCount = gDefaultSwapchainImageCount;
         TextureUsageFlag ImageUsage = TextureUsageFlag::ColorAttachment;
     };
 
@@ -395,6 +402,7 @@ namespace RHI
 
         UIntPtr Native = UIntPtr::Null();
         PixelFormat Format = PixelFormat::Undefined;
+        ColorSpace ColorSpace = gDefaultSurfaceColorSpace;
         UInt32 Width = 0;
         UInt32 Height = 0;
         Array<TextureHandle> Images;

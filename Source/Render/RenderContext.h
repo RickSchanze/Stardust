@@ -1,9 +1,13 @@
 #pragma once
+
 #include "Core/Number.h"
 #include "Core/Singleton.h"
 
-class RenderContext : Singleton<RenderContext>
+class RenderContext : public Singleton<RenderContext>
 {
 public:
-    void Tick(Double DeltaSeconds);
+    bool Startup() override;
+    bool Shutdown() override;
+
+    void Tick(const Double DeltaSeconds);
 };

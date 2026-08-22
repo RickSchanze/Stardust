@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Debug/Debug.h"
+
 template <typename T>
 class Singleton
 {

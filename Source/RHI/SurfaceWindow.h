@@ -11,8 +11,9 @@ namespace RHI
         SurfaceDesc Surface{};
         bool CreateSwapchain = true;
         PresentMode PresentMode = PresentMode::Fifo;
-        PixelFormat Format = PixelFormat::Undefined;
-        UInt32 PreferredImageCount = 0;
+        PixelFormat Format = gDefaultSurfaceFormat;
+        ColorSpace ColorSpace = gDefaultSurfaceColorSpace;
+        UInt32 PreferredImageCount = gDefaultSwapchainImageCount;
         TextureUsageFlag ImageUsage = TextureUsageFlag::ColorAttachment;
     };
 

@@ -6,11 +6,11 @@
 
 namespace RHI
 {
-
     class SurfaceWindowManager : public Singleton<SurfaceWindowManager>
     {
     public:
         bool Shutdown() override;
+        bool Startup() override;
 
         [[nodiscard]] SurfaceWindow* Create(const SurfaceWindowDesc& Desc, const char* DebugName = nullptr);
         void Destroy(SurfaceWindow* Window);
@@ -20,7 +20,13 @@ namespace RHI
             return static_cast<UInt32>(mWindows.Num());
         }
 
+        [[nodiscard]] SurfaceWindow* GetMainWindow() const
+        {
+            return mMainWindow;
+        }
+
     private:
+        SurfaceWindow* mMainWindow = nullptr;
         Array<SurfaceWindow*> mWindows;
     };
 

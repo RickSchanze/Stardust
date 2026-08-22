@@ -5,7 +5,7 @@
 #include "Core/Debug/Debug.h"
 #include "Core/Logging/Logger.h"
 #include "Core/Profiler/Profiler.h"
-#include "RHI/Device.h"
+#include "Render/RenderContext.h"
 
 void EngineGlobalData::ResetFrameTiming()
 {
@@ -73,12 +73,7 @@ bool EngineLoop::Startup()
     Assert(!mInitialized);
     LogInfo(Engine, "Engine startup started");
 
-    if (!RHI::CreateVulkanDevice())
-    {
-        LogCritical(Engine, "Failed to create Vulkan device");
-        RHI::DestroyVulkanDevice();
-        return false;
-    }
+    Assert(RenderContext::CreateInstance());
 
     gEngineGlobalData.ResetFrameTiming();
     mInitialized = true;
@@ -119,7 +114,7 @@ void EngineLoop::Shutdown()
             gEngineGlobalData.GetElapsedSeconds().Value);
 
     mRunning = false;
-    RHI::DestroyVulkanDevice();
+    RenderContext::DestroyInstance();
     mInitialized = false;
     LogInfo(Engine, "Engine shutdown completed");
 }
@@ -150,5 +145,5 @@ void EngineLoop::TickPhysics(const Double DeltaSeconds)
 void EngineLoop::TickRender(const Double DeltaSeconds)
 {
     PerformanceCounter RenderCounter{"EngineLoop::TickRender"};
-    (void)DeltaSeconds;
+    RenderContext::GetInstance().Tick(DeltaSeconds);
 }

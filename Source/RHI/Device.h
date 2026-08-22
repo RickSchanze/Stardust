@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RHI/Commands.h"
+#include "RHI/GPUResourcePool.h"
 #include "RHI/Resources.h"
 
 namespace RHI
@@ -37,7 +38,7 @@ namespace RHI
         virtual void DestroyShader(const ShaderHandle Handle) = 0;
 
         virtual DescriptorSetLayoutHandle CreateDescriptorSetLayout(const DescriptorSetLayoutDesc& Desc,
-                                                                   const char* DebugName = nullptr) = 0;
+                                                                    const char* DebugName = nullptr) = 0;
         virtual void DestroyDescriptorSetLayout(const DescriptorSetLayoutHandle Handle) = 0;
 
         virtual PipelineLayoutHandle CreatePipelineLayout(const PipelineLayoutDesc& Desc,

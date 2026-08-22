@@ -126,13 +126,25 @@ namespace
     }
 
     [[nodiscard]] VkSurfaceFormatKHR ChooseSwapchainFormat(const Array<VkSurfaceFormatKHR>& Formats,
-                                                           const PixelFormat Preferred)
+                                                           const PixelFormat Preferred,
+                                                           const ColorSpace PreferredColorSpace)
     {
+        const auto PreferredVkFormat = static_cast<VkFormat>(Preferred);
+        const auto PreferredVkColorSpace = static_cast<VkColorSpaceKHR>(PreferredColorSpace);
+
         if (Preferred != PixelFormat::Undefined)
         {
             for (const VkSurfaceFormatKHR& Format : Formats)
             {
-                if (Format.format == static_cast<VkFormat>(Preferred))
+                if (Format.format == PreferredVkFormat && Format.colorSpace == PreferredVkColorSpace)
+                {
+                    return Format;
+                }
+            }
+
+            for (const VkSurfaceFormatKHR& Format : Formats)
+            {
+                if (Format.format == PreferredVkFormat)
                 {
                     return Format;
                 }
@@ -141,8 +153,7 @@ namespace
 
         for (const VkSurfaceFormatKHR& Format : Formats)
         {
-            if (Format.format == VK_FORMAT_B8G8R8A8_SRGB &&
-                Format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+            if (Format.format == VK_FORMAT_B8G8R8A8_SRGB && Format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
             {
                 return Format;
             }
@@ -177,10 +188,10 @@ namespace
             .width = RequestedWidth,
             .height = RequestedHeight,
         };
-        Extent.width = std::max(Capabilities.minImageExtent.width,
-                                std::min(Capabilities.maxImageExtent.width, Extent.width));
-        Extent.height = std::max(Capabilities.minImageExtent.height,
-                                 std::min(Capabilities.maxImageExtent.height, Extent.height));
+        Extent.width =
+            std::max(Capabilities.minImageExtent.width, std::min(Capabilities.maxImageExtent.width, Extent.width));
+        Extent.height =
+            std::max(Capabilities.minImageExtent.height, std::min(Capabilities.maxImageExtent.height, Extent.height));
         return Extent;
     }
 
@@ -1222,8 +1233,8 @@ GraphicsPipelineHandle VulkanDevice::CreateGraphicsPipeline(const GraphicsPipeli
         return {};
     }
 
-    if (!IsPipelineLayoutValid(Desc.Layout) || !IsShaderValid(Desc.VertexShader) || !IsShaderValid(Desc.FragmentShader) ||
-        !IsRenderPassValid(Desc.RenderPass))
+    if (!IsPipelineLayoutValid(Desc.Layout) || !IsShaderValid(Desc.VertexShader) ||
+        !IsShaderValid(Desc.FragmentShader) || !IsRenderPassValid(Desc.RenderPass))
     {
         LogResourceError(String{"GraphicsPipelineDesc references one or more invalid handles"}, DebugName);
         return {};
@@ -1797,8 +1808,8 @@ SurfaceHandle VulkanDevice::CreateSurface(const SurfaceDesc& Desc, const char* D
     }
 
     VkBool32 PresentSupported = VK_FALSE;
-    if (vkGetPhysicalDeviceSurfaceSupportKHR(
-            mPhysicalDevice, mGraphicsQueueFamily, Surface, &PresentSupported) != VK_SUCCESS ||
+    if (vkGetPhysicalDeviceSurfaceSupportKHR(mPhysicalDevice, mGraphicsQueueFamily, Surface, &PresentSupported) !=
+            VK_SUCCESS ||
         PresentSupported != VK_TRUE)
     {
         LogResourceError(String{"Selected graphics queue does not support presentation to this surface"}, DebugName);
@@ -1911,7 +1922,7 @@ SwapchainHandle VulkanDevice::CreateSwapchain(const SwapchainDesc& Desc, const c
         }
     }
 
-    const VkSurfaceFormatKHR SurfaceFormat = ChooseSwapchainFormat(Formats, Desc.Format);
+    const VkSurfaceFormatKHR SurfaceFormat = ChooseSwapchainFormat(Formats, Desc.Format, Desc.ColorSpace);
     const VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes, Desc.PresentMode);
     const VkExtent2D Extent = ChooseSwapchainExtent(Capabilities, RequestedWidth, RequestedHeight);
     if (Extent.width == 0 || Extent.height == 0)
@@ -1967,6 +1978,7 @@ SwapchainHandle VulkanDevice::CreateSwapchain(const SwapchainDesc& Desc, const c
     GPUSwapchain Resource(Desc);
     Resource.Native = UIntPtr::FromPtr(Swapchain);
     Resource.Format = static_cast<PixelFormat>(SurfaceFormat.format);
+    Resource.ColorSpace = static_cast<ColorSpace>(SurfaceFormat.colorSpace);
     Resource.Width = Extent.width;
     Resource.Height = Extent.height;
     Resource.Images.Reserve(SwapchainImageCount);
@@ -2002,9 +2014,8 @@ SwapchainHandle VulkanDevice::CreateSwapchain(const SwapchainDesc& Desc, const c
         AssignResourceDebugName(ImageResource.DebugName, ImageDebugName, nullptr);
         if (ImageResource.DebugName[0] != '\0')
         {
-            SetObjectDebugName(VK_OBJECT_TYPE_IMAGE,
-                               reinterpret_cast<std::uint64_t>(SwapchainImages[Index]),
-                               ImageResource.DebugName);
+            SetObjectDebugName(
+                VK_OBJECT_TYPE_IMAGE, reinterpret_cast<std::uint64_t>(SwapchainImages[Index]), ImageResource.DebugName);
         }
 
         const TextureHandle ImageHandle = ToTypedHandle<TextureHandle>(mTextures.Create(std::move(ImageResource)));

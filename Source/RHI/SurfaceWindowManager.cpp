@@ -5,6 +5,13 @@
 
 namespace RHI
 {
+    bool SurfaceWindowManager::Startup()
+    {
+        mMainWindow = Create(SurfaceWindowDesc{}, "MainWindow");
+        Assert(mMainWindow != nullptr);
+        return true;
+    }
+
     bool SurfaceWindowManager::Shutdown()
     {
         for (SurfaceWindow* const Window : mWindows)
@@ -16,6 +23,7 @@ namespace RHI
             }
         }
         mWindows.Clear();
+        mMainWindow = nullptr;
         return true;
     }
 
@@ -44,6 +52,11 @@ namespace RHI
             if (mWindows[Index] != Window)
             {
                 continue;
+            }
+
+            if (Window == mMainWindow)
+            {
+                mMainWindow = nullptr;
             }
 
             Window->UnInit();

@@ -70,7 +70,7 @@ namespace RHI
     private:
         void EnsurePayloadCapacity()
         {
-            mResources.Resize(mResources.Capacity());
+            mResources.Resize(mHandles.Capacity());
         }
 
         GPUHandlePool mHandles;

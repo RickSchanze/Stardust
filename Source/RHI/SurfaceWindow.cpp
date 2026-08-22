@@ -84,14 +84,16 @@ namespace RHI
         SwapchainHandle Swapchain{};
         if (Desc.CreateSwapchain)
         {
-            SwapchainDesc SwapchainInfo{};
-            SwapchainInfo.Surface = Surface;
-            SwapchainInfo.PresentMode = Desc.PresentMode;
-            SwapchainInfo.Format = Desc.Format;
-            SwapchainInfo.Width = Desc.Surface.Width;
-            SwapchainInfo.Height = Desc.Surface.Height;
-            SwapchainInfo.PreferredImageCount = Desc.PreferredImageCount;
-            SwapchainInfo.ImageUsage = Desc.ImageUsage;
+            const SwapchainDesc SwapchainInfo{
+                .Surface = Surface,
+                .PresentMode = Desc.PresentMode,
+                .Format = Desc.Format,
+                .ColorSpace = Desc.ColorSpace,
+                .Width = Desc.Surface.Width,
+                .Height = Desc.Surface.Height,
+                .PreferredImageCount = Desc.PreferredImageCount,
+                .ImageUsage = Desc.ImageUsage,
+            };
 
             Swapchain = Device.CreateSwapchain(SwapchainInfo, DebugName);
             if (Swapchain.IsNull())
