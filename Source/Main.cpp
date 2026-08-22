@@ -1,20 +1,7 @@
-#include <mimalloc-new-delete.h>
-#include "Core/Debug/Debug.h"
-#include "Core/Profiler/Profiler.h"
-#include "RHI/Device.h"
-
-static int Main()
-{
-    PerformanceCounter _{"Main"};
-
-    Assert(RHI::CreateVulkanDevice());
-    RHI::DestroyVulkanDevice();
-
-    MarkFrame();
-    return 0;
-}
+#include "App/Application.h"
 
 int main()
 {
-    return Main();
+    Application App;
+    return App.Run();
 }

@@ -280,6 +280,14 @@ bool VulkanDevice::Init()
         return false;
     }
 
+    if (!SDL_Vulkan_LoadLibrary(nullptr))
+    {
+        LogCritical(RHI, "Failed to load Vulkan through SDL: {}", SDL_GetError());
+        UnInit();
+        return false;
+    }
+    mSdlVulkanLoaded = true;
+
     if (!CreateInstance())
     {
         UnInit();
@@ -357,6 +365,12 @@ void VulkanDevice::UnInit()
 
     mPhysicalDevice = VK_NULL_HANDLE;
     mGraphicsQueueFamily = 0;
+
+    if (mSdlVulkanLoaded)
+    {
+        SDL_Vulkan_UnloadLibrary();
+        mSdlVulkanLoaded = false;
+    }
 
     if (mSdlVideoOwned)
     {

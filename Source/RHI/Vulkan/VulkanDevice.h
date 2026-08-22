@@ -81,6 +81,7 @@ namespace RHI
         UInt32 mGraphicsQueueFamily = 0;
         VmaAllocator mAllocator = nullptr;
         bool mSdlVideoOwned = false;
+        bool mSdlVulkanLoaded = false;
 #if STARDUST_RHI_ENABLE_VALIDATION
         VkDebugUtilsMessengerEXT mDebugMessenger = VK_NULL_HANDLE;
         bool mValidationEnabled = false;
