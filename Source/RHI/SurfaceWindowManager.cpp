@@ -5,8 +5,7 @@
 
 namespace RHI
 {
-
-    void SurfaceWindowManager::Shutdown()
+    bool SurfaceWindowManager::Shutdown()
     {
         for (SurfaceWindow* const Window : mWindows)
         {
@@ -17,6 +16,7 @@ namespace RHI
             }
         }
         mWindows.Clear();
+        return true;
     }
 
     SurfaceWindow* SurfaceWindowManager::Create(const SurfaceWindowDesc& Desc, const char* DebugName)

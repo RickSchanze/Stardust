@@ -10,7 +10,7 @@ namespace RHI
     class SurfaceWindowManager : public Singleton<SurfaceWindowManager>
     {
     public:
-        void Shutdown() override;
+        bool Shutdown() override;
 
         [[nodiscard]] SurfaceWindow* Create(const SurfaceWindowDesc& Desc, const char* DebugName = nullptr);
         void Destroy(SurfaceWindow* Window);
