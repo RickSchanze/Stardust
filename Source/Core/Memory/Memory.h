@@ -11,6 +11,11 @@
     return mi_malloc(Size);
 }
 
+[[nodiscard]] inline void* MallocAligned(std::size_t Size, std::size_t Alignment) noexcept
+{
+    return mi_malloc_aligned(Size, Alignment);
+}
+
 [[nodiscard]] inline void* Calloc(std::size_t Count, std::size_t Size) noexcept
 {
     return mi_calloc(Count, Size);

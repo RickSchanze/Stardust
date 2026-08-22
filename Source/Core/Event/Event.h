@@ -21,6 +21,7 @@ public:
     using Base::IsBound;
     using Base::Num;
     using Base::Remove;
+    using Base::Reserve;
 
 private:
     using Base::Broadcast;

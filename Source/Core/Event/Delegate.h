@@ -35,6 +35,7 @@ public:
     void BindRaw(Class* Object, Ret (Class::*Method)(Args...))
     {
         Assert(Object != nullptr);
+        Assert(Method != nullptr);
         mCallable.Assign(DelegateDetail::MemberBinding<Class, Ret, Args...>{.Object = Object, .Method = Method});
     }
 
@@ -42,6 +43,7 @@ public:
     void BindRaw(const Class* Object, Ret (Class::*Method)(Args...) const)
     {
         Assert(Object != nullptr);
+        Assert(Method != nullptr);
         mCallable.Assign(DelegateDetail::ConstMemberBinding<Class, Ret, Args...>{.Object = Object, .Method = Method});
     }
 
@@ -50,7 +52,8 @@ public:
     void BindStatic(Ret2 (*Function)(Args2...))
     {
         Assert(Function != nullptr);
-        mCallable.Assign([Function](Args... Arguments) -> Ret { return Function(std::forward<Args>(Arguments)...); });
+        mCallable.Assign(
+            [Function](Args&&... Arguments) -> Ret { return Function(std::forward<Args>(Arguments)...); });
     }
 
     void Unbind() noexcept
